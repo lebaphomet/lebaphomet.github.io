@@ -54,9 +54,10 @@
 PING bastion (10.10.10.134) 56(84) bytes of data.</br>
 64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms</br>
 64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms</p>
-Now we scan for ports and interesting stuff:</br>
 
-nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134 </br></br>
+<p>Now we scan for ports and interesting stuff:</p>
+
+<b> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134 </br></br></b>
 Using nmap we got some interesting ports open:</br> </br>
 
 PORT STATE SERVICE VERSION</br>
@@ -88,10 +89,25 @@ I went for the SMB route; If we take a close look at nmap info;</br></br>
 |_ Message signing enabled but not required</br>
 | smb2-time:</br>
 | date: 2020–05–25 22:39:57</br>
-|_ start_date: 2020–05–25 18:03:52</br>
+|_ start_date: 2020–05–25 18:03:52</br> </br>
 
- tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur sapien risus, commodo eget turpis at, elementum convallis enim turpis, lorem ipsum dolor sit amet nullam.</p>
-								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dapibus rutrum facilisis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Etiam tristique libero eu nibh porttitor fermentum. Nullam venenatis erat id vehicula viverra. Nunc ultrices eros ut ultricies condimentum. Mauris risus lacus, blandit sit amet venenatis non, bibendum vitae dolor. Nunc lorem mauris, fringilla in aliquam at, euismod in lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In non lorem sit amet elit placerat maximus. Pellentesque aliquam maximus risus. Donec eget ex magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis dolor imperdiet dolor mattis sagittis. Praesent rutrum sem diam, vitae egestas enim auctor sit amet. Pellentesque leo mauris, consectetur id ipsum.</p>
+								<p> Here we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;</p>
+								<p>Let’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.</p>
+
+								<p>msf5 > use auxiliary/scanner/smb/smb_enumshares</p>
+
+								We set the options required: </br>
+
+								<p><b>msf5 auxiliary(scanner/smb/smb_enumshares) > set rhost 10.10.10.134 </br>
+									rhost => 10.10.10.134</br>
+									msf5 auxiliary(scanner/smb/smb_enumshares) > set showfiles yes</br>
+									showfiles => true </p></b>
+
+									<p>and Exploit/run!
+
+
+
+
 							</section>
 
 					</div>
