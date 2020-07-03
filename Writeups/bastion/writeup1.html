@@ -60,7 +60,7 @@ PING bastion (10.10.10.134) 56(84) bytes of data.</br>
 <b> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134 </br></br></b>
 Using nmap we got some interesting ports open:</br> </br>
 
-PORT STATE SERVICE VERSION</br>
+<b>PORT STATE SERVICE VERSION</br>
 22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)</br>
 | ssh-hostkey:</br>
 | 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)</br>
@@ -69,11 +69,11 @@ PORT STATE SERVICE VERSION</br>
 135/tcp open msrpc Microsoft Windows RPC</br>
 139/tcp open netbios-ssn Microsoft Windows netbios-ssn</br>
 445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds</br>
-Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows</br></br>
+Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows</br></br></b>
 
 Soo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.</br>
 I went for the SMB route; If we take a close look at nmap info;</br></br>
-| smb-os-discovery:</br>
+<b>| smb-os-discovery:</br>
 | OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)</br>
 | Computer name: Bastion</br>
 | NetBIOS computer name: BASTION\x00</br>
@@ -89,21 +89,50 @@ I went for the SMB route; If we take a close look at nmap info;</br></br>
 |_ Message signing enabled but not required</br>
 | smb2-time:</br>
 | date: 2020–05–25 22:39:57</br>
-|_ start_date: 2020–05–25 18:03:52</br> </br>
+|_ start_date: 2020–05–25 18:03:52</br> </br> </b>
 
-								<p> Here we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;</p>
-								<p>Let’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.</p>
+<p> Here we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;</p>
+<p>Let’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.</p>
 
-								<p>msf5 > use auxiliary/scanner/smb/smb_enumshares</p>
+<b><p>msf5 > use auxiliary/scanner/smb/smb_enumshares</p></b>
 
-								We set the options required: </br>
+We set the options required: </br>
 
-								<p><b>msf5 auxiliary(scanner/smb/smb_enumshares) > set rhost 10.10.10.134 </br>
-									rhost => 10.10.10.134</br>
-									msf5 auxiliary(scanner/smb/smb_enumshares) > set showfiles yes</br>
-									showfiles => true </p></b>
+<p><b>msf5 auxiliary(scanner/smb/smb_enumshares) > set rhost 10.10.10.134 </br>
+rhost => 10.10.10.134</br>
+msf5 auxiliary(scanner/smb/smb_enumshares) > set showfiles yes</br>
+showfiles => true </p></b>
 
-									<p>and Exploit/run!
+<p>and Exploit/run!</p>
+
+<b><p> msf5 auxiliary(scanner/smb/smb_enumshares) > exploit </br>
+[-] 10.10.10.134:139 — Login Failed: Unable to Negotiate with remote host</br>
+[+] 10.10.10.134:445 — ADMIN$ — (DS) Remote Admin </br>
+[+] 10.10.10.134:445 — Backups — (DS) </br>
+[+] 10.10.10.134:445 — C$ — (DS) Default share </br>
+[+] 10.10.10.134:445 — IPC$ — (I) Remote IPC </br>
+[*] 10.10.10.134: — Scanned 1 of 1 hosts (100% complete) </br> </b> </p>
+
+
+<p>It’s always nice to see a backup dir laying around.</br>
+Using SMBMap can be quite fast also; </p>
+
+<p><b>root@kek:~/htb/bastion# smbmap -H 10.10.10.134 -u guest </br>
+[+] Finding open SMB ports…. </br>
+[+] User SMB session establishd on 10.10.10.134… </br>
+[+] IP: 10.10.10.134:445 Name: bastion.htb </br>
+Disk Permissions </br>
+— — — — — — — - </br>
+ADMIN$ NO ACCESS </br>
+Backups READ, WRITE </br>
+[!] Unable to remove test directory at \\10.10.10.134\Backups\tBNzRnYGJM, plreae remove manually </br>
+C$ NO ACCESS </br>
+IPC$ READ ONLY </b> </p>
+
+Listing further on that backup dir: </br>
+<b> | root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups </b>
+
+
 
 
 
