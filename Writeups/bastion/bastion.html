@@ -130,7 +130,7 @@ IPC$ READ ONLY </code></pre>
 
 Listing further on that backup dir: </br>
 <pre><code>| root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups</b></code></pre>
-	<div class="image main"><img src="bastion2.png" alt="smbmap" /></div>
+	<div class="image main"><img src="bastion2.jpg" alt="smbmap" /></div>
 
 <p> Interesting enough we got a note.txt and some .vhd files that immediately took my attention; vhd files are virtual hard disks but look at the size ( ͡° ͜ʖ ͡°) </p>
 Let’s look at note.txt
@@ -172,12 +172,12 @@ Let’s look at note.txt
 <p> now, how the h*ck we mount those vhd? well, I learned how to using this stackoverflow: https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux <p>
 
 <pre><code>|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# guestmount — add /mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup\ 2019–02–22\ 124351/9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd — inspector — ro /mnt/vhd -v </b></code></pre>
-<div class="image main"><img src="bastion3.png" alt="hey" /></div>
+<div class="image main"><img src="bastion3.jpg" alt="hey" /></div>
 
 <p>Explored Users and found no flag tho.<br>
 But hey! we got a “Windows\System32\config” dir! <br>
 So we pull both SAM and SYSTEM files. </p>
-<div class="image main"><img src="bastion4.png" alt="lsls" /></div>
+<div class="image main"><img src="bastion4.jpg" alt="lsls" /></div>
 
 <p>Now we got the hash and we need to crack it, either online on some repo or hash cat :) </p>
 
@@ -194,7 +194,7 @@ So we pull both SAM and SYSTEM files. </p>
 	 bastion\l4mpje </code></pre>
 
 	And now going directly to \Desktop we’ll find the <b>user.txt</b>
-	<div class="image"><img src="bastion5.png" alt="user" /></div>
+	<div class="image"><img src="bastion5.jpg" alt="user" /></div>
 
 <p>	Now we go back to lookup and we have access and whatnot.</p>
 	Let’s see how we can get to root.txt</p>
@@ -233,7 +233,7 @@ Once decrypted you’ll have the password, be able to ssh into the box as admini
 Password: thXLHM96BeKL0ER2
 root@kek:~/htb/bastion/mremoteng-decrypt# ssh administrator@10.10.10.134
 administrator@10.10.10.134’s password:</code></pre>
-<div class="image"><img src="bastion6.png" alt="user" /></div> <br><br>
+<div class="image"><img src="bastion6.jpg" alt="user" /></div> <br><br>
 
 <p>Hope this was at someway useful, informative perhaps. Even though this is a bit of an old box it’s always good to go back and practice a bit.<br>
 Keep in consideration I am not by any means an expert or highly efficient on this yet and a lot of the process was trimmed in order to keep the post as short as I could.<br>
@@ -241,7 +241,7 @@ Hopefully I will be uploading a write up for retired machiones, every Monday fro
 Thanks for taking the time to read this or skip here too!</p>
 
 <b><p>Hack the planet! x)</p></b>
-<div class="image"><img src="1_8WINeDA9BY08yp2xvoQGIQ.png" alt="user" /></div>
+<div class="image"><img src="1_8WINeDA9BY08yp2xvoQGIQ.jpg" alt="user" /></div>
 
 
 
