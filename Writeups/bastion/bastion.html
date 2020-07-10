@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Bastion Write up</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../..//assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo">Le Baphomet</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="../../index.html">Home</a></li>
+							<li class="active"><a href="generic.html">Hackthebox</a></li>
+							<li><a href="../../elements.html">Archive</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/rodhnny/" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="https://github.com/lebaphomet" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<span class="date">April 25, 2020</span>
+									<h1>[HackTheBox]<br />
+									htb{Bastion}</h1>
+									<p>A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.<br />
+										We have the basic information for the box, It’s a Windows Machine we got IP and off we go..<br />
+									Let's get into it! .</p>
+								</header>
+								<div class="image main"><img src="bastion.jpg" alt="" /></div>
+								<p>root@kek:/# ping bastion.htb </br>
+
+PING bastion (10.10.10.134) 56(84) bytes of data.</br>
+64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms</br>
+64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms</p>
+
+<p>Now we scan for ports and interesting stuff:</p>
+
+<b> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134 </br></br></b>
+Using nmap we got some interesting ports open:</br> </br>
+
+<b>PORT STATE SERVICE VERSION</br>
+22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)</br>
+| ssh-hostkey:</br>
+| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)</br>
+| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)</br>
+|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)</br>
+135/tcp open msrpc Microsoft Windows RPC</br>
+139/tcp open netbios-ssn Microsoft Windows netbios-ssn</br>
+445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds</br>
+Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows</br></br></b>
+
+Soo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.</br>
+I went for the SMB route; If we take a close look at nmap info;</br></br>
+<b>| smb-os-discovery:</br>
+| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)</br>
+| Computer name: Bastion</br>
+| NetBIOS computer name: BASTION\x00</br>
+| Workgroup: WORKGROUP\x00</br>
+|_ System time: 2020–05–26T04:39:56+02:00</br>
+| smb-security-mode:</br>
+| account_used: guest</br>
+| authentication_level: user</br>
+| challenge_response: supported</br>
+|_ message_signing: disabled (dangerous, but default)</br>
+| smb2-security-mode:</br>
+| 2.02:</br>
+|_ Message signing enabled but not required</br>
+| smb2-time:</br>
+| date: 2020–05–25 22:39:57</br>
+|_ start_date: 2020–05–25 18:03:52</br> </br> </b>
+
+<p> Here we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;</p>
+<p>Let’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.</p>
+
+<b><p>msf5 > use auxiliary/scanner/smb/smb_enumshares</p></b>
+
+We set the options required: </br>
+
+<p><b>msf5 auxiliary(scanner/smb/smb_enumshares) > set rhost 10.10.10.134 </br>
+rhost => 10.10.10.134</br>
+msf5 auxiliary(scanner/smb/smb_enumshares) > set showfiles yes</br>
+showfiles => true </p></b>
+
+<p>and Exploit/run!</p>
+
+<b><p> msf5 auxiliary(scanner/smb/smb_enumshares) > exploit </br>
+[-] 10.10.10.134:139 — Login Failed: Unable to Negotiate with remote host</br>
+[+] 10.10.10.134:445 — ADMIN$ — (DS) Remote Admin </br>
+[+] 10.10.10.134:445 — Backups — (DS) </br>
+[+] 10.10.10.134:445 — C$ — (DS) Default share </br>
+[+] 10.10.10.134:445 — IPC$ — (I) Remote IPC </br>
+[*] 10.10.10.134: — Scanned 1 of 1 hosts (100% complete) </br> </b> </p>
+
+
+<p>It’s always nice to see a backup dir laying around.</br>
+Using SMBMap can be quite fast also; </p>
+
+<p><b>root@kek:~/htb/bastion# smbmap -H 10.10.10.134 -u guest </br>
+[+] Finding open SMB ports…. </br>
+[+] User SMB session establishd on 10.10.10.134… </br>
+[+] IP: 10.10.10.134:445 Name: bastion.htb </br>
+Disk Permissions </br>
+— — — — — — — - </br>
+ADMIN$ NO ACCESS </br>
+Backups READ, WRITE </br>
+[!] Unable to remove test directory at \\10.10.10.134\Backups\tBNzRnYGJM, plreae remove manually </br>
+C$ NO ACCESS </br>
+IPC$ READ ONLY </b> </p>
+
+Listing further on that backup dir: </br>
+<b> | root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups </b>
+
+
+
+
+
+
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="../../assets/js/jquery.min.js"></script>
+			<script src="../../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../../assets/js/browser.min.js"></script>
+			<script src="../../assets/js/breakpoints.min.js"></script>
+			<script src="../../assets/js/util.js"></script>
+			<script src="../../assets/js/main.js"></script>
+
+	</body>
+</html>
