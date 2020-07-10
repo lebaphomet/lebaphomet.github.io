@@ -54,10 +54,10 @@ PING bastion (10.10.10.134) 56(84) bytes of data.
 64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms
 64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms</b></code></pre>
 
-<p>Now we scan for ports and interesting stuff:</p>
+Now we scan for ports and interesting stuff:
 
 <pre><code><b> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134</code></pre></b>
-Using nmap we got some interesting ports open:</br> </br>
+Using nmap we got some interesting ports open:</br>
 
 <pre><code><b>PORT STATE SERVICE VERSION
 22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)
