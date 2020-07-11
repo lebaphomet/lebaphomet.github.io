@@ -3451,8 +3451,8 @@ padding: 5px;
 		@media screen and (max-width: 980px) {
 
 			#intro {
-				padding: 4rem 4rem 2rem 4rem ;
-				min-height: 20vh;
+				padding: 2rem 2rem 1rem 2rem ;
+				min-height: 5vh;
 			}
 
 				#intro p br {
