@@ -3452,7 +3452,7 @@ padding: 5px;
 
 			#intro {
 				padding: 4rem 4rem 2rem 4rem ;
-				min-height: 5vh;
+				min-height: 20vh;
 			}
 
 				#intro p br {
@@ -3460,7 +3460,7 @@ padding: 5px;
 				}
 
 				#intro + #header {
-					margin-top: -7rem;
+					margin-top: -14rem;
 				}
 
 		}
