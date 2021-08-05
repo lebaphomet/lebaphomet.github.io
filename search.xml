@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>More Ransomware targeting ESXI Hosts</title>
+      <link href="/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"/>
+      <url>/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/</url>
+      
+        <content type="html"><![CDATA[<p>More ransomware variants are seen on the wild targeting more and more ESXI hosts.</p><p>Within the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.<br>MalwareHunterTeam recently found a linux version of the REvil ransomware that was targeting ESXI servers by using the ESXCLI commands.</p><p>Today was detected a Blackmatter’s ransomware x64 linux variant \ ESXCLI Variant.</p><p>Firewall disable via  ESXCLI:</p><p><code>esxcli network firewall  set --enabled false</code></p><p>Forcibly Stop a Virtual Machine with ESXCLI<br>(query ..-&gt;”WorldID,DisplayName”):</p><p><code>esxcli vm process kill --type=force --world-id &lt;ID&gt;</code></p><div class="image main"> <p><img src="/assets/images/esxcli.png" alt="information"></p></div><p>via: Vitali Kremez <a href="https://twitter.com/VK_Intel">https://twitter.com/VK_Intel</a><br><a href="https://twitter.com/VK_Intel/status/1423188690126266370">https://twitter.com/VK_Intel/status/1423188690126266370</a></p><p>Crowdstrike has a really good article as well on ransomware targeting ESXI server:<br><a href="https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/">https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/</a></p><p>TrueSec has a really good post on Securing ESXI host against ransomware:<br><a href="https://blog.truesec.com/2021/04/13/secure-your-vmware-esxi-hosts-against-ransomware/">https://blog.truesec.com/2021/04/13/secure-your-vmware-esxi-hosts-against-ransomware/</a></p><p>Friendly reminder to have your ESXI host and vCenter management instances isolated and only accessible to the admins or persons in charge.  </p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> VMware </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HTB Resolute Write Up</title>
       <link href="/2021/08/02/HTB-Resolute-Write-Up/"/>
       <url>/2021/08/02/HTB-Resolute-Write-Up/</url>

@@ -268,6 +268,61 @@
                     
                         <a
                             class="link-unstyled"
+                            href="/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                            aria-label=": More Ransomware targeting ESXI Hosts"
+                        >
+                            More Ransomware targeting ESXI Hosts
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2021-08-05T13:26:27-06:00">
+	
+		    Aug 05, 2021
+    	
+    </time>
+    
+</div>
+
+            </div>
+            
+                <div class="postShorten-excerpt">
+                    <p>More ransomware variants are seen on the wild targeting more and more ESXI hosts.</p>
+<p>Within the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.<br>MalwareHunterTeam recently found a linux version of the REvil ransomware that was targeting ESXI servers by using the ESXCLI commands.</p>
+<p>Today was detected a Blackmatter’s ransomware x64 linux variant \ ESXCLI Variant.</p>
+<p>Firewall disable via  ESXCLI:</p>
+<p><code>esxcli network firewall  set --enabled false</code></p>
+<p>Forcibly Stop a Virtual Machine with ESXCLI<br>(query ..-&gt;”WorldID,DisplayName”):</p>
+<p><code>esxcli vm process kill --type=force --world-id &lt;ID&gt;</code></p>
+<div class="image main"> <p><img src="/assets/images/esxcli.png" alt="information"></p></div>
+
+<p>via: Vitali Kremez <a target="_blank" rel="noopener" href="https://twitter.com/VK_Intel">https://twitter.com/VK_Intel</a><br><a target="_blank" rel="noopener" href="https://twitter.com/VK_Intel/status/1423188690126266370">https://twitter.com/VK_Intel/status/1423188690126266370</a></p>
+<p>Crowdstrike has a really good article as well on ransomware targeting ESXI server:<br><a target="_blank" rel="noopener" href="https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/">https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/</a></p>
+                    
+                        <a
+                            href="/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": More Ransomware targeting ESXI Hosts"
+                        >
+                            Continue reading
+                        </a>
+                        
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
+    <article class="postShorten postShorten--thumbnailimg-right">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a
+                            class="link-unstyled"
                             href="/2021/08/02/HTB-Resolute-Write-Up/"
                             aria-label=": HTB Resolute Write Up"
                         >

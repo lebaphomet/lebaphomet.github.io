@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="baphzero">
-    <title>Archives: 2021/8 - baphzero</title>
+    <title>Tag: VMware - baphzero</title>
     <meta name="author" content="Rodhnny Acosta">
     
     
@@ -14,7 +14,7 @@
     <script type="application/ld+json">{}</script>
     <meta property="og:type" content="blog">
 <meta property="og:title" content="baphzero">
-<meta property="og:url" content="https://lebaphomet.github.io/archives/2021/08/index.html">
+<meta property="og:url" content="https://lebaphomet.github.io/tags/VMware/index.html">
 <meta property="og:site_name" content="baphzero">
 <meta property="og:locale" content="en_US">
 <meta property="article:author" content="Rodhnny Acosta">
@@ -315,253 +315,6 @@
         
     </article>
     
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2021/08/02/HTB-Resolute-Write-Up/"
-                            aria-label=": HTB Resolute Write Up"
-                        >
-                            HTB Resolute Write Up
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2021-08-02T22:44:35-06:00">
-	
-		    Aug 02, 2021
-    	
-    </time>
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <h1 id="Resolute"><a href="#Resolute" class="headerlink" title="Resolute!"></a>Resolute!</h1><p>A not so old Machine retired just a few days (if you are reading this around 06/02/20).<br>Another Windows OS based machine, Windows machines are my least favorite ones :(  </p>
-<p>But here’s my write up for Resolute!</p>
-<p>Please note for the sake of keeping the post short I’ve trimmed a lot of stuff from my original experience with the machine.</p>
-
-
-<div class="image main"> <p><img src="/assets/images/resolute.jpg" alt="information"></p></div>
-
-<p>Starting off with reaching the box which has IP: 10.10.10.169</p>
-<pre><code>root@kek:~# ping resolute.htb
-PING resolute.htb (10.10.10.169) 56(84) bytes of data.
-64 bytes from resolute.htb (10.10.10.169): icmp_seq=1 ttl=127 time=97.10 ms
-64 bytes from resolute.htb (10.10.10.169): icmp_seq=2 ttl=127 time=126 ms
-64 bytes from resolute.htb (10.10.10.169): icmp_seq=3 ttl=127 time=115 ms
-</code></pre>
-<p>Now off to fire up our nmap scan:</p>
-<pre><code>| root@kek:~/htb/resolute# nmap -sV -sC -sC -T4 Resolute.htb 10.10.10.169
-</code></pre>
-<p>All them ports:</p>
-                    
-                        <a
-                            href="/2021/08/02/HTB-Resolute-Write-Up/"
-                            class="postShorten-excerpt_link link"
-                            aria-label=": HTB Resolute Write Up"
-                        >
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2021/08/02/HTB-Bastion-Write-Up/"
-                            aria-label=": HTB Bastion Write Up"
-                        >
-                            HTB Bastion Write Up
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2021-08-02T22:37:02-06:00">
-	
-		    Aug 02, 2021
-    	
-    </time>
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <h1 id="Bastion"><a href="#Bastion" class="headerlink" title="Bastion!"></a>Bastion!</h1><p>A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.<br>We have the basic information for the box, It’s a Windows Machine we got IP and off we go..<br>Let’s get into it! .</p>
-
-
-<div class="image main"> <p><img src="/assets/images/bastion.jpg" alt="bastion"></p></div>
-
-<pre><code>root@kek:/# ping bastion.htb
-PING bastion (10.10.10.134) 56(84) bytes of data.
-64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms
-64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms
-</code></pre>
-<p>Now we scan for ports and interesting stuff:</p>
-<pre><code> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134
-</code></pre>
-<p>Using nmap we got some interesting ports open:  </p>
-<pre><code>PORT STATE SERVICE VERSION
-22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)
-| ssh-hostkey:
-| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
-| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
-|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)
-135/tcp open msrpc Microsoft Windows RPC
-139/tcp open netbios-ssn Microsoft Windows netbios-ssn
-445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
-Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows
-</code></pre>
-<p>Soo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.<br>I went for the SMB route; If we take a close look at nmap info;</p>
-<pre><code>| smb-os-discovery:
-| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
-| Computer name: Bastion
-| NetBIOS computer name: BASTION\x00
-| Workgroup: WORKGROUP\x00
-|_ System time: 2020–05–26T04:39:56+02:00
-| smb-security-mode:
-| account_used: guest
-| authentication_level: user
-| challenge_response: supported
-|_ message_signing: disabled (dangerous, but default)
-| smb2-security-mode:
-| 2.02:
-|_ Message signing enabled but not required
-| smb2-time:
-| date: 2020–05–25 22:39:57
-|_ start_date: 2020–05–25 18:03:52&gt;
-</code></pre>
-                    
-                        <a
-                            href="/2021/08/02/HTB-Bastion-Write-Up/"
-                            class="postShorten-excerpt_link link"
-                            aria-label=": HTB Bastion Write Up"
-                        >
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-bottom">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2021/08/02/Blog-under-maintenance-due-technology-change/"
-                            aria-label=": Blog under maintenance due technology change 08/02 - ???"
-                        >
-                            Blog under maintenance due technology change 08/02 - ???
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2021-08-02T16:45:10-06:00">
-	
-		    Aug 02, 2021
-    	
-    </time>
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-content">
-                    
-                    
-                        
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2021/08/02/Blog-under-maintenance-due-technology-change/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                Comment and share
-                            </a>
-                        </p>
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
-    
-    <article class="postShorten postShorten--thumbnailimg-right">
-        <div class="postShorten-wrap">
-            
-            <div class="postShorten-header">
-                <h1 class="postShorten-title">
-                    
-                        <a
-                            class="link-unstyled"
-                            href="/2021/08/02/hello-world/"
-                            aria-label=": Hello World"
-                        >
-                            Hello World
-                        </a>
-                    
-                </h1>
-                <div class="postShorten-meta">
-    <time datetime="2021-08-02T03:01:11-06:00">
-	
-		    Aug 02, 2021
-    	
-    </time>
-    
-</div>
-
-            </div>
-            
-                <div class="postShorten-excerpt">
-                    <p>Welcome to my blog</p>
-
-                    
-                        <a
-                            href="/2021/08/02/hello-world/"
-                            class="postShorten-excerpt_link link"
-                            aria-label=": Hello World"
-                        >
-                            Continue reading
-                        </a>
-                        
-                    
-                </div>
-            
-        </div>
-        
-    </article>
-    
     <div class="pagination-bar">
     <ul class="pagination">
         
@@ -571,7 +324,6 @@ Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft
 </div>
 
 </section>
-
 
 
                 <footer id="footer" class="main-content-wrap">
