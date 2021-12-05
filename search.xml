@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>Tanzu community edition</title>
+      <link href="/2021/12/05/Tanzu-community-edition/"/>
+      <url>/2021/12/05/Tanzu-community-edition/</url>
+      
+        <content type="html"><![CDATA[<p>A few weeks ago VMware decided to allow the community in general to try out Tanzu.<br>This by releasing a full deploy’able community edition of Tanzu.</p><div class="image main"> <p><img src="/assets/images/tanzu.jpg" alt="tanzu"></p></div><p>What’s Tanzu Community?<br>As explained on their landing page;<br>“VMware Tanzu Community Edition is a full-featured, easy-to-manage Kubernetes platform for learners and users, especially those working in small-scale or preproduction environments”</p><p>Remember this is not supported by their product support centre. This edition is community supported.</p><p>Also VMware has a All-in Academy for Kubernetes <a href="https://kube.academy/">https://kube.academy/</a>.<br>Be sure to check it out, it does have awesome training material with useful resources, and it’s FREE!</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> VMware </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>More Ransomware targeting ESXI Hosts</title>
       <link href="/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"/>
       <url>/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/</url>
