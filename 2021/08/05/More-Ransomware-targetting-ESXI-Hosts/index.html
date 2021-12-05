@@ -1,133 +1,298 @@
-<!DOCTYPE HTML>
-<html>
+
+<!DOCTYPE html>
+<html lang="en">
+    
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="pragma" content="no-cache">
-  <meta http-equiv="cache-control" content="no-cache">
-  <meta http-equiv="expires" content="0">
-  
-  <title>More Ransomware targeting ESXI Hosts | baphzero</title>
-  <meta name="author" content="Rodhnny Acosta">
-  
-  <meta name="description" content="More ransomware variants are seen on the wild targeting more and more ESXI hosts.
-Within the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.MalwareHunterTeam recently found a linux version of the REvil ransomware that was targeting ESXI servers by using the ESXCLI commands.
-Today was detected a Blackmatter’s ransomware x64 linux variant \ ESXCLI Variant.
-Firewall disable via  ESXCLI:
-esxcli network firewall  set --enabled false
-Forcibly Stop a Virtual Machine with ESXCLI(query ..-&amp;gt;”WorldID,DisplayName”):
-esxcli vm process kill --type=force --world-id &amp;lt;ID&amp;gt;
- 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="baphzero">
+    <title>More Ransomware targeting ESXI Hosts - baphzero</title>
+    <meta name="author" content="Rodhnny Acosta">
+    
+    
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Rodhnny Acosta","sameAs":["https://github.com/lebaphomet","https://www.linkedin.com/in/rodhnny/","mailto:baphometsec@protonmail.com"],"image":"https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png"},"articleBody":"More ransomware variants are seen on the wild targeting more and more ESXI hosts.\nWithin the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.MalwareHunterTeam recently found a linux version of the REvil ransomware that was targeting ESXI servers by using the ESXCLI commands.\nToday was detected a Blackmatter’s ransomware x64 linux variant \\ ESXCLI Variant.\nFirewall disable via  ESXCLI:\nesxcli network firewall  set --enabled false\nForcibly Stop a Virtual Machine with ESXCLI(query ..-&gt;”WorldID,DisplayName”):\nesxcli vm process kill --type=force --world-id &lt;ID&gt;\n \n\nvia: Vitali Kremez https://twitter.com/VK_Intelhttps://twitter.com/VK_Intel/status/1423188690126266370\nCrowdstrike has a really good article as well on ransomware targeting ESXI server:https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/\nTrueSec has a really good post on Securing ESXI host against ransomware:https://blog.truesec.com/2021/04/13/secure-your-vmware-esxi-hosts-against-ransomware/\nFriendly reminder to have your ESXI host and vCenter management instances isolated and only accessible to the admins or persons in charge.  \n","dateCreated":"2021-08-05T21:26:27+02:00","dateModified":"2021-08-05T22:15:35+02:00","datePublished":"2021-08-05T21:26:27+02:00","description":"More ransomware variants are seen on the wild targeting more and more ESXI hosts.\nWithin the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.MalwareHunterTeam recently found a linux version of the REvil ransomware that was targeting ESXI servers by using the ESXCLI commands.\nToday was detected a Blackmatter’s ransomware x64 linux variant \\ ESXCLI Variant.\nFirewall disable via  ESXCLI:\nesxcli network firewall  set --enabled false\nForcibly Stop a Virtual Machine with ESXCLI(query ..-&gt;”WorldID,DisplayName”):\nesxcli vm process kill --type=force --world-id &lt;ID&gt;\n \n\nvia: Vitali Kremez https://twitter.com/VK_Intelhttps://twitter.com/VK_Intel/status/1423188690126266370\nCrowdstrike has a really good article as well on ransomware targeting ESXI server:https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/","headline":"More Ransomware targeting ESXI Hosts","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"},"publisher":{"@type":"Organization","name":"Rodhnny Acosta","sameAs":["https://github.com/lebaphomet","https://www.linkedin.com/in/rodhnny/","mailto:baphometsec@protonmail.com"],"image":"https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png","logo":{"@type":"ImageObject","url":"https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png"}},"url":"https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/","keywords":"VMware"}</script>
+    <meta name="description" content="More ransomware variants are seen on the wild targeting more and more ESXI hosts. Within the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="More Ransomware targeting ESXI Hosts">
+<meta property="og:url" content="https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/index.html">
+<meta property="og:site_name" content="baphzero">
+<meta property="og:description" content="More ransomware variants are seen on the wild targeting more and more ESXI hosts. Within the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://lebaphomet.github.io/assets/images/esxcli.png">
+<meta property="article:published_time" content="2021-08-05T19:26:27.000Z">
+<meta property="article:modified_time" content="2021-08-05T20:15:35.328Z">
+<meta property="article:author" content="Rodhnny Acosta">
+<meta property="article:tag" content="VMware">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lebaphomet.github.io/assets/images/esxcli.png">
+    
+    
+        
+    
+    
+        <meta property="og:image" content="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png"/>
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-2cg7f3yw3inv7vilzvqcjpkpbkbvauq6jl3h0sedbsueyodphvaphhmtroby.min.css">
 
-via: Vitali Kremez https://twitter.com/VK_Intelhttps://twitter.com/VK_Intel/status/1423188690126266370
-Crowdstrike has a really good article as well on ransomware targeting ESXI server:https://www.crowdstrike.com/blog/carbon-spider-sprite-spider-target-esxi-servers-with-ransomware/"> 
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!--STYLES END-->
+    
 
-  <meta property="og:title" content="More Ransomware targeting ESXI Hosts"/>
-  <meta property="og:site_name" content="baphzero"/>
+    
 
-  
-    <meta property="og:image" content=""/>
-  
+    
+        
+    
+</head>
 
-  
-  
-    <link href="/favicon.png" rel="icon">
-  
-  
-  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
-  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-
-  <script src="/js/jquery-2.0.3.min.js"></script>
-
-  <!-- analytics -->
-  
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
 
 
+<header id="header" data-behavior="5">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a
+            class="header-title-link"
+            href="/"
+            aria-label=""
+        >
+            baphzero
+        </a>
+    </div>
+    
+        
+        
+            <i class="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png fa-lg"></i>
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
 
 
-<meta name="generator" content="Hexo 5.4.0"></head>
 
- <body>  
-  <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-      <button type="button" class="navbar-header navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-		<span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-	  <a class="navbar-brand" href="/">baphzero</a>
-      <div class="collapse navbar-collapse nav-menu">
-		<ul class="nav navbar-nav">
-		  
-		  <li>
-			<a href="/archives" title="All the articles.">
-			  <i class=""></i>Archives
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/categories" title="All the categories.">
-			  <i class=""></i>Categories
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/tags" title="All the tags.">
-			  <i class=""></i>Tags
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/about" title="About me.">
-			  <i class=""></i>About
-			</a>
-		  </li>
-		  
-		  <li>
-			<a href="/atom.xml" title="Subscribe me.">
-			  <i class=""></i>RSS
-			</a>
-		  </li>
-		  
-		</ul>
-      </div>
-    </div> <!-- container -->
+        
+    
+
+<nav id="sidebar" data-behavior="5">
+    <div class="sidebar-container">
+        
+            <div class="sidebar-profile">
+                <a
+                    href="/#about"
+                    aria-label="Read more about the author"
+                >
+                    <img class="sidebar-profile-picture" src="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png" alt="Author&#39;s picture"/>
+                </a>
+                <h4 class="sidebar-profile-name">Rodhnny Acosta</h4>
+                
+                    <h5 class="sidebar-profile-bio"><p>Interested in security, virtualization and Disaster Recovery, trying to learn something everyday.</p>
+</h5>
+                
+            </div>
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/"
+                            
+                            rel="noopener"
+                            title="Home"
+                        >
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-categories"
+                            
+                            rel="noopener"
+                            title="Categories"
+                        >
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Categories</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-tags"
+                            
+                            rel="noopener"
+                            title="Tags"
+                        >
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Tags</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/all-archives"
+                            
+                            rel="noopener"
+                            title="Archives"
+                        >
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Archives</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link open-algolia-search"
+                            href="#search"
+                            
+                            rel="noopener"
+                            title="Search"
+                        >
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Search</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="#about"
+                            
+                            rel="noopener"
+                            title="About"
+                        >
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://github.com/lebaphomet"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="GitHub"
+                        >
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="https://www.linkedin.com/in/rodhnny/"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="LinkedIn"
+                        >
+                        <i class="sidebar-button-icon fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">LinkedIn</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="mailto:baphometsec@protonmail.com"
+                            
+                                target="_blank"
+                            
+                            rel="noopener"
+                            title="Mail"
+                        >
+                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Mail</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a
+                            class="sidebar-button-link "
+                            href="/atom.xml"
+                            
+                            rel="noopener"
+                            title="RSS"
+                        >
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
 </nav>
-<div class="clearfix"></div>
 
-  <div class="container">
-  	<div class="content">
-    	 
-
-
+            
+            <div id="main" data-behavior="5"
+                 class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            More Ransomware targeting ESXI Hosts
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2021-08-05T21:26:27+02:00">
 	
-		<div class="page-header">
-			<h1> More Ransomware targeting ESXI Hosts</h1>
-		</div>
-	
+		    Aug 05, 2021
+    	
+    </time>
+    
+</div>
 
+    
+</div>
 
-
-<div class="row post">
-	<!-- cols -->
-	
-	<div id="top_meta"></div>
-	<div class="col-md-9">
-	
-
-	<!-- content -->
-	<div class="mypage">		
-	  		
-
-	  <p>More ransomware variants are seen on the wild targeting more and more ESXI hosts.</p>
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>More ransomware variants are seen on the wild targeting more and more ESXI hosts.</p>
 <p>Within the few last months some ransomware variants have been found targeting ESXI servers and their virtual machines.<br>MalwareHunterTeam recently found a linux version of the REvil ransomware that was targeting ESXI servers by using the ESXCLI commands.</p>
 <p>Today was detected a Blackmatter’s ransomware x64 linux variant \ ESXCLI Variant.</p>
 <p>Firewall disable via  ESXCLI:</p>
@@ -141,172 +306,285 @@ Crowdstrike has a really good article as well on ransomware targeting ESXI serve
 <p>TrueSec has a really good post on Securing ESXI host against ransomware:<br><a target="_blank" rel="noopener" href="https://blog.truesec.com/2021/04/13/secure-your-vmware-esxi-hosts-against-ransomware/">https://blog.truesec.com/2021/04/13/secure-your-vmware-esxi-hosts-against-ransomware/</a></p>
 <p>Friendly reminder to have your ESXI host and vCenter management instances isolated and only accessible to the admins or persons in charge.  </p>
 
-	  <div class="article-footer-copyright">
-
-    本博客采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议(CC BY-NC-SA 4.0) 发布.
-</div>
-
-	</div>
-
-	
-	<span id="/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/" class="leancloud-visitors view" data-flag-title="More Ransomware targeting ESXI Hosts">
-		<em class="post-meta-item-text"> Page View </em> <i class="leancloud-visitors-count"></i>
-	</span>
-	
-	<div>
-  	<center>
-
-	<div class="pagination">
-
-    
-    
-    <a href="/2021/08/20/HTB-BountyHunter-Write-Up/" type="button" class="btn btn-default"><i
-                class="fa fa-arrow-circle-o-left"></i> Prev</a>
-    
-
-    <a href="/" type="button" class="btn btn-default"><i class="fa fa-home"></i>Home</a>
-    
-    <a href="/2021/08/03/HTB-Resolute-Write-Up/" type="button" class="btn btn-default ">Next<i
-                class="fa fa-arrow-circle-o-right"></i></a>
-    
-
-    
-</div>
+            
 
 
-    </center>
-	</div>
-	
-	<!-- comment -->
-	<!--
-<section id="comment">
-    <h2 class="title">Comments</h2>
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">TAGGED IN</span><br/>
+                
+    <a class="tag tag--primary tag--small t-none-link" href="/tags/VMware/" rel="tag">VMware</a>
 
-    
-</section>
-
--->
-	
-		<section id="comments" class="comments">
-			<style>
-			.comments{margin:30px;padding:10px;background:rgb(0, 0, 0)}
-			@media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#000}}
-			</style>
-			<div id="vcomment" class="comment"></div>
-<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
-<script src="https://cdnjs.loli.net/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script>
-var valineConfig = {"enable":true,"appId":"xxx","appKey":"xxx","placeholder":"sss","visitor":true,"avatar":"monsterid","requiredFields":["nick","mail"]}
-valineConfig.el='#vcomment';
-new Valine(valineConfig);
-    // new Valine({
-    //     el: '#vcomment',
-    //     appId: "",
-    //     appKey: "",
-    //     placeholder: "sss",
-    //     avatar:"monsterid",
-    //     visitor: "true",
-    //     requiredFields: "nick,mail".split(','),
-    // });
-</script>
-
-		</section>
-	
-	</div> <!-- col-md-9/col-md-12 -->
-
-
-	
-	<div id="side_meta">
-		<div class="col-md-3" id="post_meta"> 
-
-	<!-- date -->
-	
-	<div class="meta-widget">
-	<i class="fa fa-clock-o"></i>
-	2021-08-05 
-	</div>
-	
-
-	<!-- categories -->
-    
-
-	<!-- tags -->
-	
-	<div class="meta-widget">
-	<a data-toggle="collapse" data-target="#tags"><i class="fa fa-tags"></i></a>		  
-    <ul id="tags" class="tag_box list-unstyled collapse in">	  
-	    
-  <li><a href="/tags/VMware/">VMware<span>1</span></a></li>
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2021/08/03/HTB-Resolute-Write-Up/"
+                    data-tooltip="HTB Resolute Write Up"
+                    aria-label="NEXT: HTB Resolute Write Up"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
     </ul>
-	</div>
-		
+</div>
 
-	<!-- toc -->
-	<div class="meta-widget">
-	
-	</div>
-	
-    <hr>
-	
-</div><!-- col-md-3 -->
 
-		
-
-	</div>
-	
-		
-
-</div><!-- row -->
-
-<!--
- -->
+        
+        
+            
+        
+    </div>
+</article>
 
 
 
-	</div>
-  </div>
-  <div class="container-narrow">
-  <footer> <p>
-  
-  &copy; 2021 Rodhnny Acosta's Blog
-  
-      powered by <a href="http://hexo.io/" target="_blank">Hexo</a>.Theme <a href="https://github.com/Ares-X/hexo-theme-freemind.bithack" target="_blank">freemind.bithack</a>  
-</p>
- </footer>
-</div> <!-- container-narrow -->
-  
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2021 Rodhnny Acosta. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="5">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a
+                        class="post-action-btn btn btn--disabled"
+                        aria-hidden="true"
+                    >
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">PREVIOUS</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a
+                    class="post-action-btn btn btn--default tooltip--top"
+                    href="/2021/08/03/HTB-Resolute-Write-Up/"
+                    data-tooltip="HTB Resolute Write Up"
+                    aria-label="NEXT: HTB Resolute Write Up"
+                >
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">NEXT</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a
+                class="post-action-btn btn btn--default btn-open-shareoptions"
+                href="#btn-open-shareoptions"
+                aria-label="Share this post"
+            >
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                    title="Share on Facebook"
+                    aria-label="Share on Facebook"
+                >
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a
+                    class="post-action-btn btn btn--default"
+                    target="new" href="https://twitter.com/intent/tweet?text=https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                    title="Share on Twitter"
+                    aria-label="Share on Twitter"
+                >
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#" aria-label="Back to top">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
 
 
-  
-<a id="gotop" href="#">   
-  <span>⬆︎TOP</span>
-</a>
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="5">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://www.facebook.com/sharer/sharer.php?u=https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                        aria-label="Share on Facebook"
+                    >
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Share on Facebook</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a
+                        class="share-option-btn"
+                        target="new"
+                        href="https://twitter.com/intent/tweet?text=https://lebaphomet.github.io/2021/08/05/More-Ransomware-targetting-ESXI-Hosts/"
+                        aria-label="Share on Twitter"
+                    >
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Share on Twitter</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
 
-<script src="/js/jquery.imagesloaded.min.js"></script>
-<script src="/js/gallery.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/search.js"></script> 
+
+            
+        </div>
+        
 
 
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
-<script src="/fancybox/jquery.fancybox.pack.js"></script>
-<script type="text/javascript">
-(function($){
-  $('.fancybox').fancybox();
-})(jQuery);
-</script>
+    
+        
+    
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <img id="about-card-picture" src="https://www.seekpng.com/png/full/168-1680719_cute-baphomet.png" alt="Author&#39;s picture"/>
+        
+            <h4 id="about-card-name">Rodhnny Acosta</h4>
+        
+            <div id="about-card-bio"><p>Interested in security, virtualization and Disaster Recovery, trying to learn something everyday.</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br/>
+                <p>Senior VMware System Administrator</p>
+
+            </div>
+        
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-uwwjlliggzqxx3rjxps0jqxx2ko0qzlflp35d4rguiy9epwgo4xbqazue5hw.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
 
 
 
-   <script type="text/javascript">      
-     var search_path = "search.xml";
-	 if (search_path.length == 0) {
-	 	search_path = "search.xml";
-	 }
-	 var path = "/" + search_path;
-     searchFunc(path, 'local-search-input', 'local-search-result');
-   </script>
 
-</body>
-   </html>
+    </body>
+</html>
